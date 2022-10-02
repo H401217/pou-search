@@ -1,0 +1,78 @@
+local mod = {}
+utf8 = require("utf8")
+mod.texts = {
+	--test = {v=true,e=true,x=0,y=0,sx=200,sy=50,text="",hold="holder"}
+	mail = {v=true,e=true,x=300,y=200,sx=200,sy=50,text="",hold="E-mail"},
+	pass = {v=true,e=true,x=300,y=300,sx=200,sy=50,text="",hold="Password"},
+}
+
+mod.buttons = {
+	--test = {v=true,e=true,x=300,y=20,sx=200,sy=50,func=function(self) print("hay") end}
+	login = {v=true,e=true,x=300,y=400,sx=200,sy=50,func=function(self) login(self.texts.mail.text,self.texts.pass.text) end},
+	exit = {v=true,e=true,x=30,y=100,sx=40,sy=40,func=function(self) state = "home" end},
+	button1 = {v=true,e=true,x=70,y=150,sx=100,sy=100,func=function(self) visit() end},
+	button2 = {v=true,e=true,x=220,y=150,sx=100,sy=100,func=function(self) visit(_G.Client.randomUser()) end},
+	like = {v=true,e=true,x=570,y=260,sx=60,sy=60,func=function(self) like() end},
+	unlike = {v=true,e=true,x=640,y=260,sx=60,sy=60,func=function(self) unlike() end},
+}
+
+mod.current = "test"
+
+function mod:click(x,y)
+	mod.current = ""
+	for a,b in pairs(self.texts) do
+		if x >= b.x and x <= b.x+b.sx and y >= b.y and y <= b.y+b.sy and b.e == true then
+			mod.current = tostring(a)
+		end
+	end
+	for a,b in pairs(self.buttons) do
+		if x >= b.x and x <= b.x+b.sx and y >= b.y and y <= b.y+b.sy and b.e == true then
+			b.func(self)
+		end
+	end
+end
+
+function mod:press(key)
+	if self.texts[self.current] then
+		self.texts[self.current].text = self.texts[mod.current].text .. key
+	end
+end
+
+function mod:update(dt)
+	if love.keyboard.isDown("backspace") then
+		if self.texts[self.current] then
+			-- get the byte offset to the last UTF-8 character in the string.
+			local byteoffset = utf8.offset(self.texts[self.current].text, -1)
+
+			if byteoffset then
+				-- remove the last UTF-8 character.
+				-- string.sub operates on bytes rather than UTF-8 characters, so we couldn't do string.sub(text, 1, -2).
+				self.texts[self.current].text = string.sub(self.texts[self.current].text, 1, byteoffset - 1)
+			end
+		end
+	end
+end
+
+function mod:draw()
+	for a,b in pairs(mod.texts) do
+		if b.v == true then
+			local oldfont = love.graphics.getFont()
+			local cFont = love.graphics.newFont(10)
+			love.graphics.setFont(cFont)
+			love.graphics.rectangle("line",b.x,b.y,b.sx,b.sy)
+			local rText = b.text
+			if string.len(b.text) <= 0 then
+				rText = b.hold
+			end
+			love.graphics.print(rText,b.x+b.sx/2-cFont:getWidth(rText)/2,b.y+b.sy/2-cFont:getHeight()/2)
+			love.graphics.setFont(oldfont)
+		end
+	end
+	for a,b in pairs(self.buttons) do
+		if b.v == true then
+			love.graphics.rectangle("fill",b.x,b.y,b.sx,b.sy)
+		end
+	end
+end
+
+return mod
