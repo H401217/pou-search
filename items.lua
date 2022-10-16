@@ -1,19 +1,32 @@
 local mod = {}
 utf8 = require("utf8")
+
+cursors = {
+	hand = love.mouse.getSystemCursor("hand")
+}
+
 mod.texts = {
 	--test = {v=true,e=true,x=0,y=0,sx=200,sy=50,text="",hold="holder"}
 	mail = {v=true,e=true,x=300,y=200,sx=200,sy=50,text="",hold="E-mail"},
 	pass = {v=true,e=true,x=300,y=300,sx=200,sy=50,text="",hold="Password"},
+	sNick = {v=true,e=true,x=130,y=170,sx=200,sy=50,text="",hold="Nickname"},
+	sMail = {v=true,e=true,x=130,y=270,sx=200,sy=50,text="",hold="E-Mail"},
+	sID = {v=true,e=true,x=130,y=370,sx=200,sy=50,text="",hold="ID"},
 }
 
 mod.buttons = {
 	--test = {v=true,e=true,x=300,y=20,sx=200,sy=50,func=function(self) print("hay") end}
 	login = {v=true,e=true,x=300,y=400,sx=200,sy=50,func=function(self) login(self.texts.mail.text,self.texts.pass.text) end},
 	exit = {v=true,e=true,x=30,y=100,sx=40,sy=40,func=function(self) state = "home" end},
-	button1 = {v=true,e=true,x=70,y=150,sx=100,sy=100,func=function(self) visit() end},
-	button2 = {v=true,e=true,x=220,y=150,sx=100,sy=100,func=function(self) visit(_G.Client.randomUser()) end},
-	like = {v=true,e=true,x=570,y=260,sx=60,sy=60,func=function(self) like() end},
-	unlike = {v=true,e=true,x=640,y=260,sx=60,sy=60,func=function(self) unlike() end},
+	button0 = {v=true,e=true,x=0,y=550,sx=100,sy=50,func=function(self) logout() end},
+	button1 = {v=false,e=true,x=110,y=150,sx=100,sy=100,func=function(self) visit() end},
+	button2 = {v=false,e=true,x=270,y=150,sx=100,sy=100,func=function(self) visit(_G.Client.randomUser()) end},
+	button3 = {v=false,e=true,x=430,y=150,sx=100,sy=100,func=function(self) state = "search" end},
+	button4 = {v=false,e=true,x=580,y=150,sx=100,sy=100,func=function(self)  end},
+	like = {v=true,e=true,x=80,y=320,sx=100,sy=100,func=function(self) if account.isFollowing==1 then unlike() else like() end end},
+	sNick = {v=true,e=true,x=330,y=170,sx=50,sy=50,func=function(self) visit(_G.Client.getUserByNickname(self.texts.sNick.text)) end},
+	sMail = {v=true,e=true,x=330,y=270,sx=50,sy=50,func=function(self) visit(_G.Client.getUserByEmail(self.texts.sMail.text)) end},
+	sID = {v=true,e=true,x=330,y=370,sx=50,sy=50,func=function(self) visit(_G.Client.getUserById(self.texts.sID.text)) end},
 }
 
 mod.current = "test"
@@ -38,6 +51,18 @@ function mod:press(key)
 	end
 end
 
+function mod:keypress(key)
+	if love.keyboard.isDown("rctrl","lctrl") and love.keyboard.isDown("v") then
+		local text = love.system.getClipboardText()
+		print(type(text))
+		if type(text) == "string" then
+			if self.texts[self.current] then
+				self.texts[self.current].text = self.texts[mod.current].text .. text
+			end
+		end
+	end
+end
+
 function mod:update(dt)
 	if love.keyboard.isDown("backspace") then
 		if self.texts[self.current] then
@@ -50,6 +75,14 @@ function mod:update(dt)
 				self.texts[self.current].text = string.sub(self.texts[self.current].text, 1, byteoffset - 1)
 			end
 		end
+	end
+	local x,y = love.mouse.getPosition()
+	for a,b in pairs(self.buttons) do
+		if x >= b.x and x <= b.x+b.sx and y >= b.y and y <= b.y+b.sy and b.e == true then
+			love.mouse.setCursor(cursors.hand)
+			break
+		end
+		love.mouse.setCursor()
 	end
 end
 
