@@ -6,6 +6,7 @@ local md5 = require("md5")
 
 local host = "http://app.pou.me/"
 local versionCode = 254
+local versionVersion = 4
 
 local function urlencode(str)
    str = string.gsub (str, "([^0-9a-zA-Z !'()*._~-])", -- locale independent
@@ -43,6 +44,9 @@ end
 --Module
 local pou = {}
 
+pou.versionCode = 254
+pou.versionVersion = 4
+
 pou.isRegistered = function(email)
   local res = post("/ajax/site/check_email?e="..urlencode(email),false)
   --if res.registered then return res.registered else error("An error occurred") end
@@ -58,14 +62,23 @@ pou.login = function(email, pass)
   
   local r,h,c = post("/ajax/site/login?e="..urlencode(email).."&p="..md5.sumhexa(pass),false)
   --r = string.gsub(r,"\\","")
+  if not h then error("No Internet Connection") end
   client.me = r
   local _success_,___r = pcall(function() return json.decode(r) end)
   if success then r = ___r end
   if r.error then error("Couldn't Login: "..r.error.message) end
   _G.cookie = h["set-cookie"]
 
+  client.logOut = function()
+    local r,h,c = post("/ajax/account/logout?testi=",j)
+    if h then
+      _G.cookie = h["set-cookie"]
+      return true
+    end
+  end
+
   client.topLikes = function(j) --true for table, false for json string
-    local a,b,c = get("/ajax/site/top_likes?_a=1&_c=1&_v=4&_r=254",j) return a
+    local a,b,c = get("/ajax/site/top_likes?testi=",j) return a
   end
   
   client.getUserByNickname = function(nick,j)
