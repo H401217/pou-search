@@ -44,7 +44,7 @@ end
 --Module
 local pou = {}
 
-pou.versionCode = 254
+pou.versionCode = versionCode
 pou.versionVersion = 4
 
 pou.isRegistered = function(email)
@@ -62,7 +62,7 @@ pou.login = function(email, pass)
   
   local r,h,c = post("/ajax/site/login?e="..urlencode(email).."&p="..md5.sumhexa(pass),false)
   --r = string.gsub(r,"\\","")
-  if not h then error("No Internet Connection") end
+  if not h then return "no-connection" end
   client.me = r
   local _success_,___r = pcall(function() return json.decode(r) end)
   if success then r = ___r end
@@ -141,8 +141,12 @@ pou.login = function(email, pass)
     local r,h,c = get("ajax/site/top_scores?g="..game.."&d="..day,j) return r
   end
   
-  client.getGameSessions = function(gID,j)
-    local r,h,c = get("ajax/user/game_sessions?id="..r.id.."&g="..gID.."&p=1&pP=100",j) return r
+  client.getGameSessions = function(pID,gID,j) --player id --8 tictac 9 four --idk
+    local r,h,c = get("ajax/user/game_sessions?id="..pID.."&g="..gID.."&p=1&pP=100",j) return r
+  end
+  
+  client.getSession = function(gID,j)
+    local r,h,c = get("ajax/game/session/info?id="..gID.."&v=1",j) return r
   end
   
   client.changePassword = function(old,new,j)
