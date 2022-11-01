@@ -12,27 +12,39 @@ function love.load()
 	width = love.graphics:getWidth()
 	height = love.graphics:getHeight()
 	
+	pouvisit = love.graphics.newCanvas(100,100)
+
+	drawPou = require("draw")
+drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 	bannerTime = 1234567
 	bannerType = "success"
 	bannerMsg = ""
 	
 	icons = {
-		success = love.graphics.newImage("success.png"),
-		trouble = love.graphics.newImage("error.png"),
-		lvl = love.graphics.newImage("lvl.png"),
-		followers = love.graphics.newImage("followers.png"),
-		following = love.graphics.newImage("following.png"),
-		nofollow = love.graphics.newImage("nofollow.png"),
-		yesfollow = love.graphics.newImage("yesfollow.png"),
-		energy = love.graphics.newImage("energy.png"),
-		fun = love.graphics.newImage("fun.png"),
-		hunger = love.graphics.newImage("fullness.png"),
-		hp = love.graphics.newImage("health.png"),
-		home = love.graphics.newImage("home.png"),
-		b0 = love.graphics.newImage("button0.png"),
-		b1 = love.graphics.newImage("button1.png"),
-		b2 = love.graphics.newImage("button2.png"),
-		b3 = love.graphics.newImage("button3.png"),
+		success = love.graphics.newImage("assets/icons/success.png"),
+		trouble = love.graphics.newImage("assets/icons/error.png"),
+		lvl = love.graphics.newImage("assets/icons/lvl.png"),
+		followers = love.graphics.newImage("assets/icons/followers.png"),
+		following = love.graphics.newImage("assets/icons/following.png"),
+		nofollow = love.graphics.newImage("assets/icons/nofollow.png"),
+		yesfollow = love.graphics.newImage("assets/icons/yesfollow.png"),
+		energy = love.graphics.newImage("assets/icons/energy.png"),
+		fun = love.graphics.newImage("assets/icons/fun.png"),
+		hunger = love.graphics.newImage("assets/icons/fullness.png"),
+		hp = love.graphics.newImage("assets/icons/health.png"),
+		home = love.graphics.newImage("assets/icons/home.png"),
+		b0 = love.graphics.newImage("assets/icons/button0.png"),
+		b1 = love.graphics.newImage("assets/icons/button1.png"),
+		b2 = love.graphics.newImage("assets/icons/button2.png"),
+		b3 = love.graphics.newImage("assets/icons/button3.png"),
+		b4 = love.graphics.newImage("assets/icons/button4.png"),
+	}
+	
+	sounds = {
+		trouble = love.audio.newSource("assets/sounds/error.mp3","static"),
+		success = love.audio.newSource("assets/sounds/levelup.ogg","static"),
+		good = love.audio.newSource("assets/sounds/effect.ogg","static"),
+		touch = love.audio.newSource("assets/sounds/touch.ogg","static"),
 	}
 	
 	items = require("items")
@@ -61,13 +73,49 @@ function love.load()
 			cE = 0, --coins Erased
 		},
 	}
+	
+	function badState(msg)
+		sounds.trouble:play()
+		bannerMsg = msg
+		bannerType = "error"
+		bannerTime = 0
+	end
+	function goodState(msg)
+		sounds.good:play()
+		bannerMsg = msg
+		bannerType = "success"
+		bannerTime = 0
+	end
+	
+	function updateUser(tab)
+		account.id = tab.i
+		account.name = tab.n
+		account.following = tab.nF
+		account.followers = tab.nL
+		account.isFollowing = tab.iL
+		account.isFollowed = tab.lM
+		account.last = tab.state.time
+		account.state.food = tab.state.fullness
+		account.state.hp = tab.state.health
+		account.state.fun = tab.state.fun
+		account.state.sleep = tab.state.energy
+		account.lvl = tab.state.lvl
+		account.vV = tab.version
+		account.vC = tab.revision
+		local ext2 = tab.state.coins
+		local tn = tonumber
+		local function tonumber(n) local m = tn(n) if m == nil then return 0 else return m end end
+		account.state.cC = tonumber(ext2.c)+tonumber(ext2.g)+tonumber(ext2.b)+tonumber(ext2.x)+tonumber(ext2.h)
+		account.state.cE = tonumber(ext2.s)
+		drawPou:drawPou(pouvisit,{color = tostring(tab.state.bodyColors.a),sz=tab.state.size})
+	end
+	
 	function login(e,p,isdata)
 		local client = _G.Pou.login(e,p)
-		local tab = _G.json.decode(client.me)
+		if client == "no-connection" then badState("No Internet Connection") return false end
+		local tab = drawPou.toTable(client.me)
 		if tab.error then
-			bannerMsg = tab.error.message
-			bannerType = "error"
-			bannerTime = 0
+			badState(tab.error.message)
 			return false
 		else
 			if not isdata then
@@ -75,20 +123,7 @@ function love.load()
 			end
 			_G.Client = client
 			state = "home"
-			account.id = tab.i
-			account.name = tab.n
-			account.following = tab.nF
-			account.followers = tab.nL
-			local ext = json.decode(string.sub(tab.state,1,string.len(tab.state)))
-			account.last = ext.time
-			account.state.food = ext.fullness
-			account.state.hp = ext.health
-			account.state.fun = ext.fun
-			account.state.sleep = ext.energy
-			account.lvl = ext.lvl
-			local ext2 = json.decode(string.sub(ext.coins,1,string.len(ext.coins)))
-			account.state.cC = tonumber(ext2.c)+tonumber(ext2.g)+tonumber(ext2.b)+tonumber(ext2.x)
-			account.state.cE = tonumber(ext2.s)
+			updateUser(tab)
 			return true
 		end
 	end
@@ -98,10 +133,9 @@ function love.load()
 		if string.len(res)<1 then return end
 		local t = _G.json.decode(res)
 		if t.error then
-			bannerMsg = t.error.message
-			bannerType = "error"
-			bannerTime = 0
+			badState(t.error.message)
 		else
+			goodState("Success!")
 			account.followers = t.nL
 			account.isFollowing = 1
 		end
@@ -111,10 +145,9 @@ function love.load()
 		if string.len(res)<1 then return end
 		local t = _G.json.decode(res)
 		if t.error then
-			bannerMsg = t.error.message
-			bannerType = "error"
-			bannerTime = 0
+			badState(t.error.message)
 		else
+			goodState("Success!")
 			account.followers = t.nL
 			account.isFollowing = 0
 		end
@@ -123,47 +156,41 @@ function love.load()
 		print(info)
 		local tab
 		if not info then
-			tab = _G.json.decode(_G.Client.me)
+			tab = drawPou.toTable(_G.Client.me)
 		else
-			tab = _G.json.decode(info)
+			if string.len(info)==0 then badState("An Error Occurred") return end
+			tab = drawPou.toTable(info)
 			if tab.error then 
-				bannerMsg = tab.error.message
-				bannerType = "error"
-				bannerTime = 0
+				badState(tab.error.message)
 				return
 			end
 		end
-			account.id = tab.i
-			account.name = tab.n
-			account.following = tab.nF
-			account.followers = tab.nL
-			account.isFollowing = tab.iL
-			account.isFollowed = tab.lM
-			local ext = json.decode(string.sub(tab.state,1,string.len(tab.state)))
-			account.last = ext.time
-			account.state.food = ext.fullness
-			account.state.hp = ext.health
-			account.state.fun = ext.fun
-			account.state.sleep = ext.energy
-			account.lvl = ext.lvl
-			account.vV = tab.version
-			account.vC = tab.revision
-			local ext2 = json.decode(string.sub(ext.coins,1,string.len(ext.coins)))
-			local tn = tonumber
-			local function tonumber(n) local m = tn(n) if m == nil then return 0 else return m end end
-			account.state.cC = tonumber(ext2.c)+tonumber(ext2.g)+tonumber(ext2.b)+tonumber(ext2.x)+tonumber(ext2.h)
-			account.state.cE = tonumber(ext2.s)
+			updateUser(tab)
 			state = "visit"
 			items.texts.sNick.text = ""
 			items.texts.sMail.text = ""
 			items.texts.sID.text = ""
 	end
+	ttl1 = "" --temp top likes str 1 (left)
+	ttl2 = ""
+	function updateTop(str)
+		if #str == 0 then badState("An Error Occurred") return end
+		local tab = drawPou.toTable(str)
+		ttl1 = ""
+		ttl2 = ""
+		for a,b in pairs(tab["items"]) do
+			if a > 10 then
+				ttl2 = ttl2..a..". ".. b.n .. "	(".. b.nL .. " Likes)\n"
+			else
+				ttl1 = ttl1..a..". ".. b.n .. "	(".. b.nL .. " Likes)\n"
+			end
+		end
+		state = "top"
+	end
 	function logout()
 		local s = _G.Client.logOut()
 		if s then
-			bannerMsg = "Success!"
-			bannerType = "success"
-			bannerTime = 0
+			goodState("Success!")
 			love.filesystem.write("poulogin","")
 			_G.Client = nil
 			items.texts.mail.text = ""
@@ -223,6 +250,8 @@ function love.update(dt)
 		items.buttons.sMail.v = true items.buttons.sMail.e = true
 		items.buttons.sID.v = true items.buttons.sID.e = true
 		items.buttons.exit.v = false items.buttons.exit.e = true
+	elseif state == "top" then
+		items.buttons.exit.v = false items.buttons.exit.e = true
 	end
 end
 
@@ -233,7 +262,7 @@ function love.draw()
 	if state == "visit" then
 		love.graphics.draw(icons.home,items.buttons.exit.x,items.buttons.exit.y,0,items.buttons.exit.sx/icons.home:getWidth(),items.buttons.exit.sy/icons.home:getHeight())
 		love.graphics.setFont(fonts.medpou)
-		love.graphics.rectangle("fill",80,190,100,100) --pou icon
+		love.graphics.draw(pouvisit,80,190,0,1,1)
 		love.graphics.print(account.name,200,190)
 		
 		if account.isFollowing==1 and account.isFollowed==1 then
@@ -250,7 +279,11 @@ function love.draw()
 		love.graphics.setFont(fonts.def)
 		love.graphics.print("ID: "..account.id,200,230)
 		love.graphics.print(os.date("Last time saved: %x %X",account.last),200,250)
-		love.graphics.print("Coins: "..account.state.cC-account.state.cE,200,270)
+		if account.vV == 4 then
+			love.graphics.print("Coins: "..account.state.cC-account.state.cE,200,270)
+		else
+			love.graphics.print("Can't load coins from old account",200,270)
+		end
 		if account.vV == _G.Pou.versionVersion and account.vC == _G.Pou.versionCode then
 			love.graphics.print("Pou has same version as client!",200,290)
 		end
@@ -276,8 +309,13 @@ function love.draw()
 		love.graphics.draw(icons.b1,items.buttons.button1.x,items.buttons.button1.y,0,items.buttons.button1.sx/icons.b1:getWidth(),items.buttons.button1.sy/icons.b1:getHeight())
 		love.graphics.draw(icons.b2,items.buttons.button2.x,items.buttons.button2.y,0,items.buttons.button2.sx/icons.b2:getWidth(),items.buttons.button2.sy/icons.b2:getHeight())
 		love.graphics.draw(icons.b3,items.buttons.button3.x,items.buttons.button3.y,0,items.buttons.button2.sx/icons.b3:getWidth(),items.buttons.button3.sy/icons.b3:getHeight())
+		love.graphics.draw(icons.b4,items.buttons.button4.x,items.buttons.button4.y,0,items.buttons.button2.sx/icons.b4:getWidth(),items.buttons.button4.sy/icons.b4:getHeight())
 	elseif state == "search" then
 		love.graphics.draw(icons.home,items.buttons.exit.x,items.buttons.exit.y,0,items.buttons.exit.sx/icons.home:getWidth(),items.buttons.exit.sy/icons.home:getHeight())
+	elseif state == "top" then
+		love.graphics.draw(icons.home,items.buttons.exit.x,items.buttons.exit.y,0,items.buttons.exit.sx/icons.home:getWidth(),items.buttons.exit.sy/icons.home:getHeight())
+		love.graphics.setFont(fonts.smolpou)
+		love.graphics.print(ttl1..ttl2,200,150)
 	end
 	love.graphics.setColor(1,1,1,1)
 	love.graphics.setFont(fonts.def)
@@ -326,4 +364,5 @@ function love.draw()
 		love.graphics.print(bannerMsg,80,30-fonts.smolpou:getHeight()/2)
 	end
 	love.graphics.setFont(fonts.def)
+	love.graphics.print("1.4.105")
 end
