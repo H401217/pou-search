@@ -7,7 +7,7 @@ cursors = {
 
 mod.texts = {
 	--test = {v=true,e=true,x=0,y=0,sx=200,sy=50,text="",hold="holder"}
-	mail = {v=true,e=true,x=300,y=200,sx=200,sy=50,text="",hold="E-mail",tags={["password"]=1}},
+	mail = {v=true,e=true,x=300,y=200,sx=200,sy=50,text="",hold="E-mail"},
 	pass = {v=true,e=true,x=300,y=300,sx=200,sy=50,text="",hold="Password",tags={["password"]=1}},
 	sNick = {v=true,e=true,x=130,y=170,sx=200,sy=50,text="",hold="Nickname"},
 	sMail = {v=true,e=true,x=130,y=270,sx=200,sy=50,text="",hold="E-Mail"},
