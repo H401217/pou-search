@@ -7,8 +7,8 @@ cursors = {
 
 mod.texts = {
 	--test = {v=true,e=true,x=0,y=0,sx=200,sy=50,text="",hold="holder"}
-	mail = {v=true,e=true,x=300,y=200,sx=200,sy=50,text="",hold="E-mail"},
-	pass = {v=true,e=true,x=300,y=300,sx=200,sy=50,text="",hold="Password"},
+	mail = {v=true,e=true,x=300,y=200,sx=200,sy=50,text="",hold="E-mail",tags={["password"]=1}},
+	pass = {v=true,e=true,x=300,y=300,sx=200,sy=50,text="",hold="Password",tags={["password"]=1}},
 	sNick = {v=true,e=true,x=130,y=170,sx=200,sy=50,text="",hold="Nickname"},
 	sMail = {v=true,e=true,x=130,y=270,sx=200,sy=50,text="",hold="E-Mail"},
 	sID = {v=true,e=true,x=130,y=370,sx=200,sy=50,text="",hold="ID"},
@@ -22,7 +22,7 @@ mod.buttons = {
 	button1 = {v=false,e=true,x=110,y=150,sx=100,sy=100,func=function(self) visit() end},
 	button2 = {v=false,e=true,x=270,y=150,sx=100,sy=100,func=function(self) visit(_G.Client.randomUser()) end},
 	button3 = {v=false,e=true,x=430,y=150,sx=100,sy=100,func=function(self) state = "search" end},
-	button4 = {v=false,e=true,x=580,y=150,sx=100,sy=100,func=function(self)  end},
+	button4 = {v=false,e=true,x=580,y=150,sx=100,sy=100,func=function(self) updateTop(_G.Client.topLikes()) end},
 	like = {v=true,e=true,x=80,y=320,sx=100,sy=100,func=function(self) if account.isFollowing==1 then unlike() else like() end end},
 	sNick = {v=true,e=true,x=330,y=170,sx=50,sy=50,func=function(self) visit(_G.Client.getUserByNickname(self.texts.sNick.text)) end},
 	sMail = {v=true,e=true,x=330,y=270,sx=50,sy=50,func=function(self) visit(_G.Client.getUserByEmail(self.texts.sMail.text)) end},
@@ -36,10 +36,15 @@ function mod:click(x,y)
 	for a,b in pairs(self.texts) do
 		if x >= b.x and x <= b.x+b.sx and y >= b.y and y <= b.y+b.sy and b.e == true then
 			mod.current = tostring(a)
+			love.keyboard.setKeyRepeat(true)
+			love.keyboard.setTextInput(true,b.x,b.y,b.sx,b.sy)
+			break
+		else love.keyboard.setKeyRepeat(false) love.keyboard.setTextInput(false)
 		end
 	end
 	for a,b in pairs(self.buttons) do
 		if x >= b.x and x <= b.x+b.sx and y >= b.y and y <= b.y+b.sy and b.e == true then
+			sounds.touch:play()
 			b.func(self)
 		end
 	end
@@ -61,10 +66,7 @@ function mod:keypress(key)
 			end
 		end
 	end
-end
-
-function mod:update(dt)
-	if love.keyboard.isDown("backspace") then
+	if key=="backspace" then
 		if self.texts[self.current] then
 			-- get the byte offset to the last UTF-8 character in the string.
 			local byteoffset = utf8.offset(self.texts[self.current].text, -1)
@@ -76,6 +78,9 @@ function mod:update(dt)
 			end
 		end
 	end
+end
+
+function mod:update(dt)
 	local x,y = love.mouse.getPosition()
 	for a,b in pairs(self.buttons) do
 		if x >= b.x and x <= b.x+b.sx and y >= b.y and y <= b.y+b.sy and b.e == true then
@@ -94,6 +99,7 @@ function mod:draw()
 			love.graphics.setFont(cFont)
 			love.graphics.rectangle("line",b.x,b.y,b.sx,b.sy)
 			local rText = b.text
+			if b.tags then if b.tags["password"] == 1 then rText = string.rep("*",utf8.len(rText)) end end
 			if string.len(b.text) <= 0 then
 				rText = b.hold
 			end
