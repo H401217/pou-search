@@ -57,22 +57,37 @@ pou.resetPassword = function(email)
   local r,h,c = post("/ajax/site/reset_password?e="..urlencode(email),false) return r
 end
 
+pou.changeHost = function(url)
+	host = url
+	local a,b = pcall(function() return get("/ajax/site/meta?amogus=111") end)
+	if a == true then return b else return nil end
+end
+
 pou.login = function(email, pass)
+print(email,pass)
   local client = {}
-  
-  local r,h,c = post("/ajax/site/login?e="..urlencode(email).."&p="..md5.sumhexa(pass),false)
-  --r = string.gsub(r,"\\","")
-  if not h then return "no-connection" end
-  client.me = r
-  local _success_,___r = pcall(function() return json.decode(r) end)
-  if success then r = ___r end
-  if r.error then error("Couldn't Login: "..r.error.message) end
-  _G.cookie = h["set-cookie"]
+  if (email) and (pass) then
+    local r,h,c = post("/ajax/site/login?e="..urlencode(email).."&p="..md5.sumhexa(pass),false)
+    --r = string.gsub(r,"\\","")
+    if not h then return "no-connection" end
+    client.me = r
+    local _success_,___r = pcall(function() return json.decode(r) end)
+    if success then r = ___r end
+    if r.error then error("Couldn't Login: "..r.error.message) end
+    _G.cookie = h["set-cookie"]
+    client.type = "account"
+  elseif (not email) and (not pass) then
+    client.type = "guest"
+  elseif (email) and (not pass) then
+    _G.cookie = email
+    client.type = "cookie"
+  end
 
   client.logOut = function()
     local r,h,c = post("/ajax/account/logout?testi=",j)
     if h then
       _G.cookie = h["set-cookie"]
+      client.type = "guest"
       return true
     end
   end
