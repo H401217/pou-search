@@ -12,21 +12,36 @@ mod.texts = {
 	sNick = {v=true,e=true,x=130,y=170,sx=200,sy=50,text="",hold="Nickname"},
 	sMail = {v=true,e=true,x=130,y=270,sx=200,sy=50,text="",hold="E-Mail"},
 	sID = {v=true,e=true,x=130,y=370,sx=200,sy=50,text="",hold="ID"},
+	host = {v=true,e=true,x=400,y=370,sx=250,sy=30,text="http://app.pou.me/",hold="New Host URL"},
+	newNick = {v=true,e=true,x=130,y=120,sx=200,sy=30,text="",hold="New Nickname"},
+	newMail = {v=true,e=true,x=130,y=185,sx=200,sy=30,text="",hold="New Email"},
+	oldPass = {v=true,e=true,x=130,y=250,sx=200,sy=30,text="",hold="Old Password",tags={["password"]=1}},
+	newPass = {v=true,e=true,x=130,y=280,sx=200,sy=30,text="",hold="New Password"},
 }
 
 mod.buttons = {
 	--test = {v=true,e=true,x=300,y=20,sx=200,sy=50,func=function(self) print("hay") end}
 	login = {v=true,e=true,x=300,y=400,sx=200,sy=50,func=function(self) login(self.texts.mail.text,self.texts.pass.text) end},
-	exit = {v=true,e=true,x=30,y=100,sx=40,sy=40,func=function(self) state = "home" end},
-	button0 = {v=true,e=true,x=0,y=550,sx=100,sy=50,func=function(self) logout() end},
+	exit = {v=true,e=true,x=30,y=100,sx=40,sy=40,func=function(self) if configchanged==true then relogin() configchanged=false end state = "home" end},
+	button = {v=true,e=true,x=515,y=555,sx=40,sy=40,func=function(self) relogin() end}, --refresh
+	button0 = {v=true,e=true,x=0,y=550,sx=100,sy=50,func=function(self) if _G.Client.type == "guest" then state = "login" else logout() end end},
 	button1 = {v=false,e=true,x=110,y=150,sx=100,sy=100,func=function(self) visit() end},
-	button2 = {v=false,e=true,x=270,y=150,sx=100,sy=100,func=function(self) visit(_G.Client.randomUser()) end},
-	button3 = {v=false,e=true,x=430,y=150,sx=100,sy=100,func=function(self) state = "search" end},
+	button2 = {v=false,e=true,x=270,y=150,sx=100,sy=100,func=function(self) if _G.Client.type == "guest" then state = "login" else visit(_G.Client.randomUser()) end end},
+	button3 = {v=false,e=true,x=430,y=150,sx=100,sy=100,func=function(self) if _G.Client.type == "guest" then state = "login" else state = "search" end end},
 	button4 = {v=false,e=true,x=580,y=150,sx=100,sy=100,func=function(self) updateTop(_G.Client.topLikes()) end},
+	button5 = {v=false,e=true,x=580,y=310,sx=100,sy=100,func=function(self) state = "conf" end},
+	zakehweb = {v=false,e=true,x=750,y=550,sx=50,sy=50,func=function(self) love.system.openURL(server.links.web) end},
+	instagram = {v=false,e=true,x=690,y=550,sx=50,sy=50,func=function(self) love.system.openURL("https://www.instagram.com/"..server.links.instagram) end},
+	facebook = {v=false,e=true,x=630,y=550,sx=50,sy=50,func=function(self) love.system.openURL("https://www.facebook.com/"..server.links.facebook) end},
+	twitter = {v=false,e=true,x=570,y=550,sx=50,sy=50,func=function(self) love.system.openURL("https://www.twitter.com/"..server.links.twitter) end},
 	like = {v=true,e=true,x=80,y=320,sx=100,sy=100,func=function(self) if account.isFollowing==1 then unlike() else like() end end},
 	sNick = {v=true,e=true,x=330,y=170,sx=50,sy=50,func=function(self) visit(_G.Client.getUserByNickname(self.texts.sNick.text)) end},
 	sMail = {v=true,e=true,x=330,y=270,sx=50,sy=50,func=function(self) visit(_G.Client.getUserByEmail(self.texts.sMail.text)) end},
 	sID = {v=true,e=true,x=330,y=370,sx=50,sy=50,func=function(self) visit(_G.Client.getUserById(self.texts.sID.text)) end},
+	conf1 = {v=true,e=true,x=650,y=370,sx=30,sy=30,func=function(self) changeHost(self.texts.host.text) end}, --change host
+	conf2 = {v=true,e=true,x=330,y=120,sx=30,sy=30,func=function(self) userChange("name",self.texts.newNick.text) end}, --change name
+	conf4 = {v=true,e=true,x=330,y=185,sx=30,sy=30,func=function(self) userChange("mail",self.texts.newMail.text) end}, --change mail
+	conf5 = {v=true,e=true,x=330,y=280,sx=30,sy=30,func=function(self) userChange("pass",self.texts.oldPass.text,self.texts.newPass.text) end}, --change pass
 }
 
 mod.current = "test"
