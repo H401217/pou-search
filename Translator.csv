@@ -1,0 +1,32 @@
+Key;en;es;null
+newserver;Changing host will close your current Pou account! Are you sure to continue?;¡Cambiar de servidor cerrará tu cuenta de Pou actual! ¿Estás seguro de continuar?;null
+no-meta;Metadata for custom server {host} not found!;¡Los metadatos para el servidor personalizado {host} no han sido encontrados!;null
+warn;Warning!;¡Advertencia!;null
+lastlog;Last logged %s ago;Última vez logueado hace %s;null
+tS;seconds;segundos;null
+tM;minutes;minutos;null
+tH;hours;horas;null
+tD;days;días;null
+book1;Hello {player}!;¡Hola {player}!;null
+book2;How are you?;¿Cómo estás?;null
+book3;I'm fine, thank you!;Estoy bien, gracias;null
+book4;You're cute! ^_^;¡Eres muy dulce! ^_^;null
+book5;Nice house!;¡Bonita casa!;null
+book6;Nice clothes!;¡Bonita ropa!;null
+book7;Nice ball!;¡Bonita bola!;null
+book8;Nice achievements!;¡Buenos logros!;null
+book9;I like you! ^_^;¡Me gustas! ^_^;null
+book10;Let's be friends!;¡Seamos amigos!;null
+book11;Thanks for liking me!;¡Gracias por darme like!;null
+book12;Let's play together!;¡Juguemos juntos!;null
+book13;Congratulations!;¡Felicidades!;null
+book14;Thank you! ^_^;¡Gracias! ^_^;null
+book15;Have a nice day!;¡Ten un buen día!;null
+book16;Good night! Zzz;¡Buenas noches! Zzz;null
+book17;Nice garden!;¡Bonito jardín!;null
+book18;Nice car!;¡Bonito coche!;null
+matchturn;%s's turn;Turno de %s;null
+matchUturn;Your turn;Tu turno;null
+matchtie;Nobody wins;Nadie gana;null
+matchlose;%s wins;%s gana;null
+matchwin;You win!;¡Tú ganas!;null
