@@ -22,14 +22,16 @@ mod.texts = {
 mod.buttons = {
 	--test = {v=true,e=true,x=300,y=20,sx=200,sy=50,func=function(self) print("hay") end}
 	login = {v=true,e=true,x=300,y=400,sx=200,sy=50,func=function(self) login(self.texts.mail.text,self.texts.pass.text) end},
-	exit = {v=true,e=true,x=30,y=100,sx=40,sy=40,func=function(self) if configchanged==true then relogin() configchanged=false end state = "home" end},
+	exit = {v=true,e=true,x=30,y=100,sx=40,sy=40,func=function(self) if configchanged==true then relogin() configchanged=false end state = "home" substate = "" end},
 	button = {v=true,e=true,x=515,y=555,sx=40,sy=40,func=function(self) relogin() end}, --refresh
 	button0 = {v=true,e=true,x=0,y=550,sx=100,sy=50,func=function(self) if _G.Client.type == "guest" then state = "login" else logout() end end},
 	button1 = {v=false,e=true,x=110,y=150,sx=100,sy=100,func=function(self) visit() end},
 	button2 = {v=false,e=true,x=270,y=150,sx=100,sy=100,func=function(self) if _G.Client.type == "guest" then state = "login" else visit(_G.Client.randomUser()) end end},
 	button3 = {v=false,e=true,x=430,y=150,sx=100,sy=100,func=function(self) if _G.Client.type == "guest" then state = "login" else state = "search" end end},
-	button4 = {v=false,e=true,x=580,y=150,sx=100,sy=100,func=function(self) updateTop(_G.Client.topLikes()) end},
+	button4 = {v=false,e=true,x=580,y=150,sx=100,sy=100,func=function(self) substate = "page1" updateTop(_G.Client.topLikes()) end},
 	button5 = {v=false,e=true,x=580,y=310,sx=100,sy=100,func=function(self) state = "conf" end},
+	--button6 = {v=false,e=true,x=110,y=310,sx=100,sy=100,func=function(self) state = "topgame" end},
+	button7 = {v=false,e=true,x=270,y=310,sx=100,sy=100,func=function(self) state = "tictaclobby" substate="page1" updateGame(_G.Client.getGameSessions(drawPou.toTable(_G.Client.me).i,8,1,100)) end},
 	zakehweb = {v=false,e=true,x=750,y=550,sx=50,sy=50,func=function(self) love.system.openURL(server.links.web) end},
 	instagram = {v=false,e=true,x=690,y=550,sx=50,sy=50,func=function(self) love.system.openURL("https://www.instagram.com/"..server.links.instagram) end},
 	facebook = {v=false,e=true,x=630,y=550,sx=50,sy=50,func=function(self) love.system.openURL("https://www.facebook.com/"..server.links.facebook) end},
@@ -38,11 +40,22 @@ mod.buttons = {
 	sNick = {v=true,e=true,x=330,y=170,sx=50,sy=50,func=function(self) visit(_G.Client.getUserByNickname(self.texts.sNick.text)) end},
 	sMail = {v=true,e=true,x=330,y=270,sx=50,sy=50,func=function(self) visit(_G.Client.getUserByEmail(self.texts.sMail.text)) end},
 	sID = {v=true,e=true,x=330,y=370,sx=50,sy=50,func=function(self) visit(_G.Client.getUserById(self.texts.sID.text)) end},
+	right = {v=true,e=true,x=730,y=290,sx=40,sy=40,func=function(self) local _,__ = string.gsub(substate,"page","") substate="page".. (tonumber(_) or 1)+1 end},
+	left = {v=true,e=true,x=30,y=290,sx=40,sy=40,func=function(self) local _,__ = string.gsub(substate,"page","") substate="page".. (tonumber(_) or 1)-1 end},
 	conf1 = {v=true,e=true,x=650,y=370,sx=30,sy=30,func=function(self) changeHost(self.texts.host.text) end}, --change host
 	conf2 = {v=true,e=true,x=330,y=120,sx=30,sy=30,func=function(self) userChange("name",self.texts.newNick.text) end}, --change name
 	conf4 = {v=true,e=true,x=330,y=185,sx=30,sy=30,func=function(self) userChange("mail",self.texts.newMail.text) end}, --change mail
 	conf5 = {v=true,e=true,x=330,y=280,sx=30,sy=30,func=function(self) userChange("pass",self.texts.oldPass.text,self.texts.newPass.text) end}, --change pass
 }
+
+--
+	for c=0,4 do
+		for d=0,1 do
+			local position = ((d+1)+(2*c))
+			mod.buttons["pou_user"..position] = {v=false,e=true,x=90+330*d,y=130+90*c,sx=290,sy=80,func=function(self) clickuser(position) end}
+		end
+	end
+--
 
 mod.current = "test"
 
