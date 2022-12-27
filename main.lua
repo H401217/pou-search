@@ -24,7 +24,9 @@ function love.load()
 	height = love.graphics:getHeight()
 	
 	pouvisit = love.graphics.newCanvas(100,100)
+	tictactable = love.graphics.newCanvas(500,500)
 
+	translate = require("translate")
 	drawPou = require("draw")
 drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 	bannerTime = 1234567
@@ -61,11 +63,16 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 		b0 = love.graphics.newImage("assets/icons/button0.png"),
 		login = love.graphics.newImage("assets/icons/login0.png"),
 		refresh = love.graphics.newImage("assets/icons/refresh.png"),
+		prev = love.graphics.newImage("assets/icons/prev.png"),
+		next = love.graphics.newImage("assets/icons/next.png"),
+		missingpou = love.graphics.newImage("assets/icons/missing.jpg"),
 		b1 = love.graphics.newImage("assets/icons/button1.png"),
 		b2 = love.graphics.newImage("assets/icons/button2.png"),
 		b3 = love.graphics.newImage("assets/icons/button3.png"),
 		b4 = love.graphics.newImage("assets/icons/button4.png"),
 		b5 = love.graphics.newImage("assets/icons/button5.png"),
+		b6 = love.graphics.newImage("assets/icons/button6.png"),
+		b7 = love.graphics.newImage("assets/icons/button7.png"),
 	}
 	
 	sounds = {
@@ -83,6 +90,7 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 		def = love.graphics.getFont()
 	}
 	state = "home"
+	substate = ""
 	account = {
 		name = "Pou",
 		id = 666,
@@ -132,7 +140,7 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 	function updateServer(js,host)
 		print(js,host,"dos")
 		local _,t = pcall(function() return drawPou.toTable(js) end)
-		if type(t) ~= "table" then t = {} love.window.showMessageBox("Warning!","Metadata for custom server '"..host.."' not found!","warning") end
+		if type(t) ~= "table" then t = {} love.window.showMessageBox(translate:Get("warn"),"Metadata for custom server '"..host.."' not found!","warning") end
 		server.name = t.name or "Unnamed"
 		server.description = t.description or ""
 		server.image = t.image or "iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAIAAAD9iXMrAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAnSURBVChTYyAB1BMChNVtfSYLJAmrgwCoOmIBVBduQFjdCHUfAwMAXG6UCb238f8AAAAASUVORK5CYII="
@@ -204,7 +212,7 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 		local function tonumber(n) local m = tn(n) if m == nil then return 0 else return m end end
 		account.state.cC = tonumber(ext2.c)+tonumber(ext2.g)+tonumber(ext2.b)+tonumber(ext2.x)+tonumber(ext2.h)
 		account.state.cE = tonumber(ext2.s)
-		drawPou:drawPou(pouvisit,{color = tostring(tab.state.bodyColors.a),sz=tab.state.size})
+		drawPou:drawPou(pouvisit,drawPou:toDrawer(tab.state))
 	end
 	
 	function login(e,p,isdata)
@@ -301,25 +309,34 @@ print(client.type,e,p)
 			items.texts.sMail.text = ""
 			items.texts.sID.text = ""
 	end
-	ttl1 = "" --temp top likes str 1 (left)
-	ttl2 = ""
+	topLikes = {}
 	function updateTop(str)
+		print(str)
 		if #str == 0 then badState("An Error Occurred") return end
 		local tab = drawPou.toTable(str)
-		ttl1 = ""
-		ttl2 = ""
-		for a,b in pairs(tab["items"]) do
-			if a > 10 then
-				ttl2 = ttl2..a..". ".. b.n .. "	(".. b.nL .. " Likes)\n"
-			else
-				ttl1 = ttl1..a..". ".. b.n .. "	(".. b.nL .. " Likes)\n"
-			end
-		end
+		topLikes = tab or {}
 		state = "top"
+	end
+	opname = "" --opponent name
+	curMatch = {}
+	function updateGame(str)
+		local tab = drawPou.toTable(str)
+		print(str)
+		topLikes = tab or {}		
+	end
+	
+	function updateMatch(str)
+		local tab = drawPou.toTable(str) print(str)
+		if tab then
+			if tab.error then badState(tab.error.message) return end
+			curMatch = tab
+			drawPou:drawGame(tictactable,tab.s,tab.mI)
+			state = "tictacpou"
+		end
 	end
 	
 	function changeHost(newHost)
-		local a = love.window.showMessageBox("Warning!","Changing host will close your current Pou account!\nAre you sure to continue?",{"No","Yes!",escapebutton=1},"warning")
+		local a = love.window.showMessageBox(translate:Get("warn"),translate:Get("newserver"),{"No","Yes!",escapebutton=1},"warning")
 		if a == 2 then
 			logout(true)
 			local res = _G.Pou.changeHost(newHost)
@@ -354,6 +371,26 @@ print(client.type,e,p)
 			state = "login"
 		end
 	end
+	
+	function clickuser(i)
+		if state == "top" or state == "tictaclobby" then
+			local _,__ = string.gsub(substate,"page","")
+			local mul = tonumber(_) or 1
+			mul = mul-1
+			if topLikes then
+				local _tab = topLikes.items[i+10*mul]
+				local id = _tab.i or "undefined"
+				if state == "top" then
+					if id == account.id then visit() else local inf = _G.Client.getUserById(id) visit(inf) end
+				else
+					local a = _G.Client.getSession(id)
+					opname = _tab.oN or "[Unnamed]"
+					updateMatch(a)
+				end
+			end
+		end
+	end
+	
 	--local c,s = love.filesystem.read("poulogin")
 	conf,_suc = love.filesystem.read("conf.json")
 	local temptab = {fastlog = false,mail = "",password = "",cookie = "",mypou="",host="http://app.pou.me/",lastlogged=0}
@@ -399,6 +436,7 @@ end
 
 function love.mousepressed(x,y)
 	items:click(x,y)
+	print(x,y)
 end
 
 function love.update(dt)
@@ -450,7 +488,22 @@ function love.update(dt)
 		items.texts.newMail.v = true items.texts.newMail.e = true
 		items.texts.newPass.v = true items.texts.newPass.e = true
 		items.texts.oldPass.v = true items.texts.oldPass.e = true
-	elseif state == "top" then
+	elseif state == "top" or state == "tictaclobby" then
+		items.buttons.exit.v = false items.buttons.exit.e = true
+		local _,__ = string.gsub(substate,"page","")
+		local num = tonumber(_) or 1
+		if num > 1 then items.buttons.left.e = true end
+		if num*10 < #topLikes.items then items.buttons.right.e = true end
+		for a,b in pairs(items.buttons) do
+			if string.match(a,"pou_user") then
+				local count = string.gsub(a,"pou_user","")
+				--print(#topLikes.items,(num-1)*10+count,topLikes.items[(num-1)*10+count],num,a)
+				if topLikes.items[(num-1)*10+count] then
+					b.e = true
+				end
+			end
+		end
+	elseif state == "tictacpou" or state == "fourpous" then
 		items.buttons.exit.v = false items.buttons.exit.e = true
 	end
 end
@@ -469,8 +522,9 @@ function love.draw()
 		love.graphics.draw(icons.home,items.buttons.exit.x,items.buttons.exit.y,0,items.buttons.exit.sx/icons.home:getWidth(),items.buttons.exit.sy/icons.home:getHeight())
 		love.graphics.setFont(fonts.medpou)
 		love.graphics.draw(pouvisit,80,190,0,1,1)
+		if server.creator == account.id then love.graphics.setColor(0.96,0.87,0.2,1) end
 		love.graphics.print(account.name,200,190)
-		
+		love.graphics.setColor(1,1,1,1)
 		if account.isFollowing==1 and account.isFollowed==1 then
 			love.graphics.draw(icons.yesfollow,80,320,0,100/icons.yesfollow:getWidth(),100/icons.yesfollow:getHeight())
 		elseif account.isFollowing==1 then
@@ -516,20 +570,20 @@ function love.draw()
 				love.graphics.draw(icons.b0,items.buttons.button0.x,items.buttons.button0.y,0,items.buttons.button0.sx/icons.b0:getWidth(),items.buttons.button0.sy/icons.b0:getHeight())
 				love.graphics.setFont(fonts.smolpou)
 				local time = os.time()-config.lastlogged
-				local str = " seconds"
+				local str = translate:Get("tS")
 				if time >= 60 then
 					time = math.floor(time/60)
-					str = " minutes"
+					str = translate:Get("tM")
 					if time >= 60 then
 						time = math.floor(time/60)
-						str = " hours"
+						str = translate:Get("tH")
 						if time >= 24 then
 							time = math.floor(time/24)
-							str = " days"
+							str = translate:Get("tD")
 						end
 					end
 				end
-				love.graphics.print("Last logged in: "..time..str,110,565)
+				love.graphics.print(string.format(translate:Get("lastlog"),time.." "..str),110,565)
 				love.graphics.setFont(fonts.pou)
 			else
 				love.graphics.draw(icons.login,items.buttons.button0.x,items.buttons.button0.y,0,items.buttons.button0.sx/icons.login:getWidth(),items.buttons.button0.sy/icons.login:getHeight())
@@ -540,6 +594,8 @@ function love.draw()
 		love.graphics.draw(icons.b3,items.buttons.button3.x,items.buttons.button3.y,0,items.buttons.button2.sx/icons.b3:getWidth(),items.buttons.button3.sy/icons.b3:getHeight())
 		love.graphics.draw(icons.b4,items.buttons.button4.x,items.buttons.button4.y,0,items.buttons.button2.sx/icons.b4:getWidth(),items.buttons.button4.sy/icons.b4:getHeight())
 		love.graphics.draw(icons.b5,items.buttons.button5.x,items.buttons.button5.y,0,items.buttons.button5.sx/icons.b5:getWidth(),items.buttons.button5.sy/icons.b5:getHeight())
+		--love.graphics.draw(icons.b6,items.buttons.button6.x,items.buttons.button6.y,0,items.buttons.button6.sx/icons.b6:getWidth(),items.buttons.button6.sy/icons.b6:getHeight())
+		love.graphics.draw(icons.b7,items.buttons.button7.x,items.buttons.button7.y,0,items.buttons.button7.sx/icons.b7:getWidth(),items.buttons.button7.sy/icons.b7:getHeight())
 		love.graphics.draw(icons.zakeh,items.buttons.zakehweb.x,items.buttons.zakehweb.y,0,items.buttons.zakehweb.sx/icons.zakeh:getWidth(),items.buttons.zakehweb.sy/icons.zakeh:getHeight())
 		love.graphics.draw(icons.insta,items.buttons.instagram.x,items.buttons.instagram.y,0,items.buttons.instagram.sx/icons.insta:getWidth(),items.buttons.instagram.sy/icons.insta:getHeight())
 		love.graphics.draw(icons.fbico,items.buttons.facebook.x,items.buttons.facebook.y,0,items.buttons.facebook.sx/icons.fbico:getWidth(),items.buttons.facebook.sy/icons.fbico:getHeight())
@@ -551,13 +607,106 @@ function love.draw()
 		love.graphics.setColor(1,1,1,1)
 	elseif state == "search" then
 		love.graphics.draw(icons.home,items.buttons.exit.x,items.buttons.exit.y,0,items.buttons.exit.sx/icons.home:getWidth(),items.buttons.exit.sy/icons.home:getHeight())
-	elseif state == "top" then
+	elseif state == "top" or state == "tictaclobby" then
 		love.graphics.draw(icons.home,items.buttons.exit.x,items.buttons.exit.y,0,items.buttons.exit.sx/icons.home:getWidth(),items.buttons.exit.sy/icons.home:getHeight())
-		love.graphics.setColor(0.5,0.5,0.5,0.8)
+		--[[love.graphics.setColor(0.5,0.5,0.5,0.8)
 		love.graphics.rectangle("fill",170,130,470,450)
-		love.graphics.setFont(fonts.smolpou)
+		
 		love.graphics.setColor(1,1,1,1)
-		love.graphics.print(ttl1..ttl2,200,150)
+		love.graphics.print(ttl1..ttl2,200,150)]]
+		local _unn_=string.gsub(substate,"page","") --unnecesary/temp/randomnamexd
+		local mul = tonumber(_unn_) or 1
+		mul=mul-1
+		
+		
+		for b = 0,4 do
+			for a = 0,1 do
+				--local position = ( (b+1)+(5*a) )+mul*10
+				local position = ((a+1)+(2*b))+mul*10
+				local pou = topLikes.items[position]
+				if pou then
+					love.graphics.setColor(0.7,0.7,0.7,0.6)
+					love.graphics.rectangle("fill",90+330*a,130+90*b,290,80)
+					love.graphics.setColor(1,1,1,1)
+					love.graphics.setFont(fonts.smolpou)
+					
+					local mini = pou.minI or pou.oMinI or ""
+					local nam = pou.n or pou.oN or "[Unnamed]"
+					local idd = pou.i or pou.oI or 0
+
+					if mini~="" then
+						drawPou:drawPou(pouvisit,drawPou:toDrawer(_G.json.decode(mini)))
+						love.graphics.draw(pouvisit,90+330*a,130+90*b,0,80/100,80/100)
+					else
+						love.graphics.draw(icons.missingpou,90+330*a,130+90*b,0,80/icons.missingpou:getWidth(),80/icons.missingpou:getHeight())
+					end
+					
+					love.graphics.rectangle("line",90+330*a,130+90*b,290,80)
+					love.graphics.print(nam,175+330*a,133+90*b)
+					love.graphics.setFont(fonts.def)
+					love.graphics.print("ID: ".. idd,175+330*a,155+90*b)
+					if state == "top" then
+						love.graphics.print("Likes: ".. pou.nL,175+330*a,170+90*b)
+						love.graphics.print("Position: ".. position,175+330*a,185+90*b)
+					else
+						local _str = "Unknown state"
+						if pou.e then
+							if pou.wB == 0 then
+								_str = translate:Get("matchtie") love.graphics.setColor(0.4,0.4,0.4,1)
+							elseif pou.wB == pou.mI then
+								_str = translate:Get("matchwin") love.graphics.setColor(0,1,0.3,1)
+							else
+								_str = string.format(translate:Get("matchlose"),nam) love.graphics.setColor(1,0.2,0.2,1)
+							end
+							love.graphics.print(_str,175+330*a,170+90*b)
+						else
+							if pou.tO == pou.mI then
+								_str = translate:Get("matchUturn") love.graphics.setColor(0,0.7,1,1)
+							else
+								_str = string.format(translate:Get("matchturn"),nam)
+							end
+							love.graphics.print(_str,175+330*a,170+90*b)
+						end
+					end
+					love.graphics.setColor(1,1,1,1)
+					if pou.iL==1 and pou.lM==1 then
+						love.graphics.draw(icons.yesfollow,305+330*a,140+90*b,0,60/icons.yesfollow:getWidth(),60/icons.yesfollow:getHeight())
+					elseif pou.iL==1 then
+						love.graphics.draw(icons.following,305+330*a,140+90*b,0,60/icons.yesfollow:getWidth(),60/icons.yesfollow:getHeight())
+					elseif pou.lM==1 then
+						love.graphics.draw(icons.followers,305+330*a,140+90*b,0,60/icons.yesfollow:getWidth(),60/icons.yesfollow:getHeight())
+					else
+						love.graphics.draw(icons.nofollow,305+330*a,140+90*b,0,60/icons.yesfollow:getWidth(),60/icons.yesfollow:getHeight())
+					end
+				end
+			end
+		end
+		if items.buttons.right.e then love.graphics.draw(icons.next,items.buttons.right.x,items.buttons.right.y,0,items.buttons.right.sx/icons.next:getWidth(),items.buttons.right.sy/icons.next:getHeight()) end
+		if items.buttons.left.e then love.graphics.draw(icons.prev,items.buttons.left.x,items.buttons.left.y,0,items.buttons.left.sx/icons.prev:getWidth(),items.buttons.left.sy/icons.prev:getHeight()) end
+	elseif state == "tictacpou" or state == "fourpous" then
+		love.graphics.draw(tictactable,400,300,0,300/tictactable:getWidth(),300/tictactable:getHeight(),tictactable:getWidth()/2,tictactable:getHeight()/2)
+		love.graphics.draw(icons.home,items.buttons.exit.x,items.buttons.exit.y,0,items.buttons.exit.sx/icons.home:getWidth(),items.buttons.exit.sy/icons.home:getHeight())
+		--anti-DRY moment
+		local _str = ""
+		if curMatch.e=="1" then
+			if curMatch.wB == "0" then
+				_str = translate:Get("matchtie") love.graphics.setColor(0.4,0.4,0.4,1)
+			elseif curMatch.wB == tostring(curMatch.mI) then
+				_str = translate:Get("matchwin") love.graphics.setColor(0,1,0.3,1)
+			else
+				_str = string.format(translate:Get("matchlose"),opname) love.graphics.setColor(1,0.2,0.2,1)
+			end
+		else
+			if curMatch.tO == tostring(curMatch.mI) then
+				_str = translate:Get("matchUturn") love.graphics.setColor(0,0.7,1,1)
+			else
+				_str = string.format(translate:Get("matchturn"),opname)
+			end
+		end
+		love.graphics.setFont(fonts.smolpou)
+		love.graphics.print(_str,400 - fonts.smolpou:getWidth(_str)/2,500)
+		love.graphics.setFont(fonts.def)
+		love.graphics.setColor(1,1,1,1)
 	elseif state == "login" then
 		love.graphics.draw(icons.home,items.buttons.exit.x,items.buttons.exit.y,0,items.buttons.exit.sx/icons.home:getWidth(),items.buttons.exit.sy/icons.home:getHeight())
 		love.graphics.draw(icons.logincard,50,200,0,200/icons.logincard:getWidth(),200/icons.logincard:getHeight())
@@ -623,5 +772,5 @@ function love.draw()
 		love.graphics.print(bannerMsg,80,30-fonts.smolpou:getHeight()/2)
 	end
 	love.graphics.setFont(fonts.def)
-	love.graphics.print("1.4.105")
+	love.graphics.print("1.4.105".."	"..love.timer.getFPS().." FPS")
 end
