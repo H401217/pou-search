@@ -77,15 +77,16 @@ end
 
 function draw:drawGame(c,data,myID)
 	--500x500
+	if type(data) ~= "table" then data = {} end
 	love.graphics.setCanvas(c)
 	love.graphics.clear()
 	myID = tostring(myID)
-	data.nC = tonumber(data.nC)
-	data.nC = tonumber(data.nR)
+	data.nC = tonumber(data.nC) or 1
+	data.nR = tonumber(data.nR) or 1
 	local divx = 500/data.nC
 	local divy = 500/data.nR
 	local board = {}
-	local _temp = data.pI
+	local _temp = data.pI or "0"
 	repeat
 		table.insert(board,string.sub(_temp,0,data.nC))
 		_temp = string.sub(_temp,data.nC+1,999)
