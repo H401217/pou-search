@@ -1,7 +1,12 @@
 Key;en;es;null
+currentLang;English;Español;null
 newserver;Changing host will close your current Pou account! Are you sure to continue?;¡Cambiar de servidor cerrará tu cuenta de Pou actual! ¿Estás seguro de continuar?;null
 no-meta;Metadata for custom server {host} not found!;¡Los metadatos para el servidor personalizado {host} no han sido encontrados!;null
 warn;Warning!;¡Advertencia!;null
+opNick;Change Nickname;Cambiar Apodo;null
+opMail;Change Email;Cambiar Correo;null
+opPass;Change Password;Cambiar Contraseña;null
+opHost;Change Server;Cambiar Servidor;null
 lastlog;Last logged %s ago;Última vez logueado hace %s;null
 tS;seconds;segundos;null
 tM;minutes;minutos;null
@@ -30,3 +35,15 @@ matchUturn;Your turn;Tu turno;null
 matchtie;Nobody wins;Nadie gana;null
 matchlose;%s wins;%s gana;null
 matchwin;You win!;¡Tú ganas!;null
+badmail;Invalid Email!;Correo Invalido;null
+changepass;Changed pass!;¡Contraseña cambiada!;null
+changemail;Changed e-mail to '%s';Correo cambiado a '%s';null
+changename;Changed nickname to '%s';Apodo cambiado a '%s';null
+IncorrectPassword;Incorrect Password;Contraseña Incorrecta;null
+NicknameNotAvailable;The nickname is not available for registration.;El apodo no esta disponible.;null
+EmailAlreadyRegistered;The e-mail is already registered.;El correo ya estaba registrado.;null
+UserNotLoggedIn;You need to login to continue.;Debes iniciar sesión para continuar.;null
+MissingArgument;Missing argument value for %s;Valor faltante para '%s';null
+InvalidArgumentFormat;Invalid value for e-mail;Valor incorrecto para el correo;null
+IncorrectUserCredentials;Incorrect user credentials.;Credenciales incorrectas;null
+ObjectNotFound;%s not found: '%s';'%s' no encontrado: '%s';null
