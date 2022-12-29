@@ -50,4 +50,35 @@ function mod:Get(key)
 	end
 end
 
+mod.langlist = {
+	"en",
+	"es",
+	"Key",
+}
+
+mod.cursor = 1
+
+function mod:Prev()
+	if mod.cursor-1 < 1 then
+		mod.cursor = #mod.langlist
+	else
+		mod.cursor = mod.cursor-1
+	end
+	mod.lang = mod.langlist[mod.cursor]
+end
+
+function mod:Next()
+	if mod.cursor+1 > #mod.langlist then
+		mod.cursor = 1
+	else
+		mod.cursor = mod.cursor+1
+	end
+	mod.lang = mod.langlist[mod.cursor]
+end
+
+
+
+
+
+
 return mod
