@@ -32,6 +32,7 @@ mod.buttons = {
 	button5 = {v=false,e=true,x=580,y=310,sx=100,sy=100,func=function(self) state = "conf" end},
 	--button6 = {v=false,e=true,x=110,y=310,sx=100,sy=100,func=function(self) state = "topgame" end},
 	button7 = {v=false,e=true,x=270,y=310,sx=100,sy=100,func=function(self) state = "tictaclobby" substate="page1" updateGame(_G.Client.getGameSessions(drawPou.toTable(_G.Client.me).i,8,1,100)) end},
+	button8 = {v=false,e=true,x=430,y=310,sx=100,sy=100,func=function(self) state = "tictaclobby" substate="page1" updateGame(_G.Client.getGameSessions(drawPou.toTable(_G.Client.me).i,9,1,100)) end},
 	zakehweb = {v=false,e=true,x=750,y=550,sx=50,sy=50,func=function(self) love.system.openURL(server.links.web) end},
 	instagram = {v=false,e=true,x=690,y=550,sx=50,sy=50,func=function(self) love.system.openURL("https://www.instagram.com/"..server.links.instagram) end},
 	facebook = {v=false,e=true,x=630,y=550,sx=50,sy=50,func=function(self) love.system.openURL("https://www.facebook.com/"..server.links.facebook) end},
@@ -46,6 +47,9 @@ mod.buttons = {
 	conf2 = {v=true,e=true,x=330,y=120,sx=30,sy=30,func=function(self) userChange("name",self.texts.newNick.text) end}, --change name
 	conf4 = {v=true,e=true,x=330,y=185,sx=30,sy=30,func=function(self) userChange("mail",self.texts.newMail.text) end}, --change mail
 	conf5 = {v=true,e=true,x=330,y=280,sx=30,sy=30,func=function(self) userChange("pass",self.texts.oldPass.text,self.texts.newPass.text) end}, --change pass
+	conf6 = {v=true,e=true,x=330,y=490,sx=30,sy=30,func=function(self) translate:Next() end}, --next lang
+	conf7 = {v=true,e=true,x=130,y=490,sx=30,sy=30,func=function(self) translate:Prev() end}, --prev lang
+	about = {v=false,e=true,x=450,y=475,sx=180,sy=60,func=function(self) state = "about" end}, --about
 }
 
 --
