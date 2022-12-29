@@ -20,6 +20,8 @@ function sColor(p)
 end
 
 function love.load()
+	ClientVersion = 2
+	
 	width = love.graphics:getWidth()
 	height = love.graphics:getHeight()
 	
@@ -66,6 +68,7 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 		prev = love.graphics.newImage("assets/icons/prev.png"),
 		next = love.graphics.newImage("assets/icons/next.png"),
 		missingpou = love.graphics.newImage("assets/icons/missing.jpg"),
+		about = love.graphics.newImage("assets/icons/about.png"),
 		b1 = love.graphics.newImage("assets/icons/button1.png"),
 		b2 = love.graphics.newImage("assets/icons/button2.png"),
 		b3 = love.graphics.newImage("assets/icons/button3.png"),
@@ -73,6 +76,7 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 		b5 = love.graphics.newImage("assets/icons/button5.png"),
 		b6 = love.graphics.newImage("assets/icons/button6.png"),
 		b7 = love.graphics.newImage("assets/icons/button7.png"),
+		b8 = love.graphics.newImage("assets/icons/button8.png"),
 	}
 	
 	sounds = {
@@ -155,7 +159,11 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 	function userChange(option,arg1,arg2)
 		local res = ""
 		if option == "mail" then
-			res = _G.Client.changeEmail(arg1)
+			if (arg1:match("[A-Za-z0-9%.%%%+%-]+@[A-Za-z0-9%.%%%+%-]+%.%w%w%w?%w?")) then
+				res = _G.Client.changeEmail(arg1)
+			else
+				badState(translate:Get("badmail")) return
+			end
 		elseif option == "pass" then
 			res = _G.Client.changePassword(arg1,arg2)
 		elseif option == "name" then
@@ -165,13 +173,13 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 		print(res,a,b)
 		if a then
 			if b.error then
-				badState(b.error.message)
+				badState(translate:Get(b.error.type))
 			end
 			if b.success == true then
 				configchanged = true
 				local aa2=arg1
 				if option == "pass" then aa2 = arg2 end
-				local msg = "Changed "..option.." to '"..aa2.."'"
+				local msg = string.format(translate:Get("change"..option),aa2)
 				goodState(msg)
 			end
 		else
@@ -225,7 +233,9 @@ print(client.type,e,p)
 		if client.type == "account" then config.lastlogged = os.time() end
 		local tab = drawPou.toTable(client.me)
 		if tab.error then
-			badState(tab.error.message)
+			local __ = tab.error.argument or {}
+			local ___ = __.name or "unknown"
+			badState(string.format(translate:Get(tab.error.type),___))
 			errord = true
 		else
 			if not isdata then
@@ -299,7 +309,7 @@ print(client.type,e,p)
 			if string.len(info)==0 then badState("An Error Occurred") return end
 			tab = drawPou.toTable(info)
 			if tab.error then 
-				badState(tab.error.message)
+				badState(string.format(translate:Get(tab.error.type),tab.error.resource.type,tab.error.resource.id))
 				return
 			end
 		end
@@ -328,8 +338,9 @@ print(client.type,e,p)
 	function updateMatch(str)
 		local tab = drawPou.toTable(str) print(str)
 		if tab then
-			if tab.error then badState(tab.error.message) return end
+			if tab.error then badState(translate:Get(tab.error.type)) return end
 			curMatch = tab
+			print(tab.s,"hehehehe")
 			drawPou:drawGame(tictactable,tab.s,tab.mI)
 			state = "tictacpou"
 		end
@@ -483,6 +494,7 @@ function love.update(dt)
 			end
 		end
 		items.buttons.exit.v = false items.buttons.exit.e = true
+		items.buttons.about.e = true
 		items.texts.host.v = true items.texts.host.e = true
 		items.texts.newNick.v = true items.texts.newNick.e = true
 		items.texts.newMail.v = true items.texts.newMail.e = true
@@ -504,6 +516,8 @@ function love.update(dt)
 			end
 		end
 	elseif state == "tictacpou" or state == "fourpous" then
+		items.buttons.exit.v = false items.buttons.exit.e = true
+	elseif state == "about" then
 		items.buttons.exit.v = false items.buttons.exit.e = true
 	end
 end
@@ -596,6 +610,7 @@ function love.draw()
 		love.graphics.draw(icons.b5,items.buttons.button5.x,items.buttons.button5.y,0,items.buttons.button5.sx/icons.b5:getWidth(),items.buttons.button5.sy/icons.b5:getHeight())
 		--love.graphics.draw(icons.b6,items.buttons.button6.x,items.buttons.button6.y,0,items.buttons.button6.sx/icons.b6:getWidth(),items.buttons.button6.sy/icons.b6:getHeight())
 		love.graphics.draw(icons.b7,items.buttons.button7.x,items.buttons.button7.y,0,items.buttons.button7.sx/icons.b7:getWidth(),items.buttons.button7.sy/icons.b7:getHeight())
+		love.graphics.draw(icons.b8,items.buttons.button8.x,items.buttons.button8.y,0,items.buttons.button8.sx/icons.b8:getWidth(),items.buttons.button8.sy/icons.b8:getHeight())
 		love.graphics.draw(icons.zakeh,items.buttons.zakehweb.x,items.buttons.zakehweb.y,0,items.buttons.zakehweb.sx/icons.zakeh:getWidth(),items.buttons.zakehweb.sy/icons.zakeh:getHeight())
 		love.graphics.draw(icons.insta,items.buttons.instagram.x,items.buttons.instagram.y,0,items.buttons.instagram.sx/icons.insta:getWidth(),items.buttons.instagram.sy/icons.insta:getHeight())
 		love.graphics.draw(icons.fbico,items.buttons.facebook.x,items.buttons.facebook.y,0,items.buttons.facebook.sx/icons.fbico:getWidth(),items.buttons.facebook.sy/icons.fbico:getHeight())
@@ -692,7 +707,7 @@ function love.draw()
 			if curMatch.wB == "0" then
 				_str = translate:Get("matchtie") love.graphics.setColor(0.4,0.4,0.4,1)
 			elseif curMatch.wB == tostring(curMatch.mI) then
-				_str = translate:Get("matchwin") love.graphics.setColor(0,1,0.3,1)
+				_str = translate:Get("matchwin") love.graphics.setColor(0,1,0.2,1)
 			else
 				_str = string.format(translate:Get("matchlose"),opname) love.graphics.setColor(1,0.2,0.2,1)
 			end
@@ -700,23 +715,32 @@ function love.draw()
 			if curMatch.tO == tostring(curMatch.mI) then
 				_str = translate:Get("matchUturn") love.graphics.setColor(0,0.7,1,1)
 			else
-				_str = string.format(translate:Get("matchturn"),opname)
+				_str = string.format(translate:Get("matchturn"),opname) love.graphics.setColor(0.2,0.2,0.2,1)
 			end
 		end
-		love.graphics.setFont(fonts.smolpou)
-		love.graphics.print(_str,400 - fonts.smolpou:getWidth(_str)/2,500)
+		love.graphics.setFont(fonts.medpou)
+		love.graphics.print(_str,400 - fonts.medpou:getWidth(_str)/2,500)
 		love.graphics.setFont(fonts.def)
 		love.graphics.setColor(1,1,1,1)
+	elseif state == "about" then
+		love.graphics.draw(icons.home,items.buttons.exit.x,items.buttons.exit.y,0,items.buttons.exit.sx/icons.home:getWidth(),items.buttons.exit.sy/icons.home:getHeight())
+		love.graphics.setFont(fonts.medpou)
+		love.graphics.print("About Pou Search v0.6 ("..ClientVersion..")",110,160)
+		love.graphics.setFont(fonts.smolpou)
+		love.graphics.print("'Pou Search' is an open source project in GitHub.\n(https://github.com/H401217/pou-search)\n\nCredits to:\n** Zakeh (Paul Salameh): Creator of Pou videogame",110,220)
+		love.graphics.setFont(fonts.def)
 	elseif state == "login" then
 		love.graphics.draw(icons.home,items.buttons.exit.x,items.buttons.exit.y,0,items.buttons.exit.sx/icons.home:getWidth(),items.buttons.exit.sy/icons.home:getHeight())
 		love.graphics.draw(icons.logincard,50,200,0,200/icons.logincard:getWidth(),200/icons.logincard:getHeight())
 	elseif state == "conf" then
 		--heads
 		love.graphics.setFont(fonts.smolpou)
-		love.graphics.print("Change Nickname",130,100)
-		love.graphics.print("Change Email",130,165)
-		love.graphics.print("Change Password",130,230)
-		love.graphics.print("Change Server",400,350)
+		love.graphics.print(translate:Get("opNick"),130,100)
+		love.graphics.print(translate:Get("opMail"),130,165)
+		love.graphics.print(translate:Get("opPass"),130,230)
+		love.graphics.print(translate:Get("opHost"),400,350)
+		love.graphics.setColor(0.1,0.1,0.1,1)
+		love.graphics.print(translate:Get("currentLang"),245-fonts.smolpou:getWidth(translate:Get("currentLang"))/2,495) love.graphics.setColor(1,1,1,1)
 		--content
 		love.graphics.draw(icons.home,items.buttons.exit.x,items.buttons.exit.y,0,items.buttons.exit.sx/icons.home:getWidth(),items.buttons.exit.sy/icons.home:getHeight())
 		love.graphics.draw(serverIcon,400,100,0,150/serverIcon:getWidth(),150/serverIcon:getHeight())
@@ -724,6 +748,7 @@ function love.draw()
 		love.graphics.setFont(fonts.def)
 		love.graphics.print(server.description,560,120)
 		love.graphics.print("Host: "..config.host.."\nFacebook: "..server.links.facebook.."\nTwitter: "..server.links.twitter.."\nInstagram: "..server.links.instagram.."\nWebsite: "..server.links.web,410,260)
+		love.graphics.draw(icons.about,items.buttons.about.x,items.buttons.about.y,0,items.buttons.about.sx/icons.about:getWidth(),items.buttons.about.sy/icons.about:getHeight())
 	end
 	love.graphics.setColor(1,1,1,1)
 	love.graphics.setFont(fonts.def)
