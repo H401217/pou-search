@@ -58,11 +58,15 @@ function draw.toTable(ft)
 	return dec(tab1)
 end
 
-local bodycolors = {["1"]={r=214,g=154,b=88}, ["2"]={r=100,g=166,b=237}, ["3"]={r=255,g=100,b=100}, ["4"]={r=255,g=98,b=41}, ["5"]={r=255,g=255,b=0}, ["6"]={r=10,g=255,b=10}, ["7"]={r=255,g=75,b=124}, ["8"]={r=255,g=255,b=255}, ["12"]={r=0,g=245,b=139}, ["10"]={r=255,g=139,b=43}, ["11"]={r=112,g=163,b=8}, ["9"]={r=176,g=0,b=240}, ["13"]={r=196,g=177,b=2}, ["14"]={r=163,g=163,b=163}, ["15"]={r=30,g=30,b=30}, ["16"]={r=255,g=0,b=166}, ["17"]={r=208,g=0,b=255}, ["18"]={r=176,g=0,b=240}, ["19"]={r=0,g=241,b=245}, ["20"]={r=73,g=41,b=255}, ["21"]={r=255,g=94,b=140}, ["22"]={r=147,g=245,b=0},}
+local colors = {
+	bodycolors = {["1"]={r=214,g=162,b=89}, ["2"]={r=65,g=125,b=255}, ["3"]={r=255,g=89,b=89}, ["4"]={r=255,g=154,b=47}, ["5"]={r=255,g=255,b=65}, ["6"]={r=65,g=255,b=65}, ["7"]={r=255,g=89,b=147}, ["8"]={r=255,g=255,b=255}, ["12"]={r=58,g=255,b=189}, ["10"]={r=255,g=129,b=81}, ["11"]={r=181,g=206,b=25}, ["9"]={r=148,g=89,b=255}, ["13"]={r=229,g=190,b=25}, ["14"]={r=182,g=182,b=182}, ["15"]={r=30,g=30,b=30}, ["16"]={r=255,g=89,b=197}, ["17"]={r=241,g=89,b=255}, ["18"]={r=197,g=87,b=255}, ["19"]={r=57,g=255,b=255}, ["20"]={r=65,g=190,b=255}, ["21"]={r=255,g=130,b=148}, ["22"]={r=182,g=255,b=23},},
+	eyecolors = {["1"]={r=0,g=0,b=0},["2"]={r=145,g=112,b=67},["3"]={r=54,g=180,b=44},["4"]={r=200,g=160,b=0},["5"]={r=145,g=145,b=145},["6"]={r=88,g=191,b=219},["7"]={r=228,g=145,b=29},["8"]={r=156,g=98,b=215},["9"]={r=255,g=101,b=255},["10"]={r=224,g=0,b=0},["11"]={r=15,g=210,b=170}},
+}
 
-function draw.toBodyColor(c)
-	local t = bodycolors[tostring(c)]
-	if t then return t else return bodycolors["1"] end
+
+function draw.toCol(tn,c)
+	local t = colors[tn][tostring(c)]
+	if t then return t else return colors[tn]["1"] end
 end
 
 function draw:toDrawer(tab)
@@ -79,9 +83,11 @@ function draw:toDrawer(tab)
 	end
 	if tab.sz then
 		ret.color = tab.bCo or 1
+		ret.ecolor = tab.eCo or 1
 		ret.sz = tab.sz or 0.5
 	elseif tab.size then
 		ret.color = tab.bodyColors.a or 1
+		ret.ecolor = ((tab["eyeColors"] or {})["a"]) or 1
 		ret.sz = tab.size or 0.5
 	else
 		return ret
@@ -93,14 +99,48 @@ function draw:toDrawer(tab)
 	return ret
 end
 
+function draw:floodfill(canvas,x,y,col)
+	love.graphics.setCanvas()
+	local imgdata = canvas:newImageData()
+	love.graphics.setCanvas(canvas)
+	local oR,oG,oB,oA = imgdata:getPixel(x,y)
+	local function paint(xx,yy)
+		local r,g,b,a = imgdata:getPixel(xx,yy)
+		if r==col.r and g == col.g and b == col.b then
+			
+		else
+			local rr = r-oR
+			local gg = g-oG
+			local bb = b-oB
+			local aa = a-oA
+			local color = (rr+gg+bb+aa)/4
+			local fcol = (-0.5+(rr+gg+bb))*(color*5)
+			if (color < 0.15 and color > -0.15) or (r==oR and g==oG and b == oB and a == oA) then
+				imgdata:setPixel(xx,yy,col.r+fcol,col.g+fcol,col.b+fcol,1)
+				paint(xx+1,yy)
+				paint(xx-1,yy)
+				paint(xx,yy+1)
+				paint(xx,yy-1)
+			end
+		end
+	end
+	paint(x,y)
+	local img = love.graphics.newImage(imgdata)
+	love.graphics.clear()
+	canvas:renderTo(function() love.graphics.draw(img) end)
+	imgdata:release()
+	img:release()
+	imgdata:release()
+end
+
 function draw:drawPou(c,data)
 	love.graphics.setCanvas(c)
-	local success = pcall(function()
-	local cl = self.toBodyColor(data.color)
+	local success,_r = pcall(function()
+	local cl = self.toCol("bodycolors",data.color)
+	local ecl = self.toCol("eyecolors",data.ecolor)
 	love.graphics.clear()
-	love.graphics.setColor(cl.r/255,cl.g/255,cl.b/255,1)
-	love.graphics.rectangle("fill",0,0,100,100)
 	love.graphics.setColor(0,0,0,1)
+	
 	local m = 0.3+0.7*((data.sz-0.5)*2)
 	local b1 = love.math.newBezierCurve({10+35-35*m,60-20+20*m, 40,0+40-40*m, 60,0+40-40*m, 90-35+35*m,60-20+20*m})
 	love.graphics.line(b1:render())
@@ -110,14 +150,18 @@ function draw:drawPou(c,data)
 
 	local b3 = love.math.newBezierCurve({10+35-35*m,60-20+20*m, 5+35-35*m,80-30+30*m, 5+35-35*m,90-30+30*m, 50,95-35+35*m})
 	love.graphics.line(b3:render())
+	local l1=80-30+30*m
 	love.graphics.setColor(1,1,1,1)
+	self:floodfill(c,50,l1,{r=cl.r/255,g=cl.g/255,b=cl.b/255,a=1})
 	love.graphics.ellipse("fill",57,36,7,9)
 	love.graphics.ellipse("fill",43,36,7,9)
 	love.graphics.setColor(0,0,0,1)
 	love.graphics.ellipse("line",57,36,7,9)
 	love.graphics.ellipse("line",43,36,7,9)
+	love.graphics.setColor(ecl.r/255,ecl.g/255,ecl.b/255,1)
 	love.graphics.ellipse("fill",57,36,3,4)
 	love.graphics.ellipse("fill",43,36,3,4)
+	love.graphics.setColor(0,0,0,1)
 	local mo
 	if data.emote == "happy" then
 		mo = love.math.newBezierCurve({35+7-7*m,50, 30+7-7*m,60-5+5*m, 37+7-7*m,63-6+6*m, 42+3-3*m,58-2+2*m})
@@ -130,8 +174,9 @@ function draw:drawPou(c,data)
 	end)
 	love.graphics.setColor(1,1,1,1)
 	if not success then
+		print(_r)
 		love.graphics.clear()
-		love.graphics.draw(missingpou)
+		love.graphics.draw(icons.missingpou,0,0,0,100/icons.missingpou:getWidth(),100/icons.missingpou:getHeight())
 	end
 	love.graphics.setCanvas()
 end

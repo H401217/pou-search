@@ -64,7 +64,7 @@ function sColor(p)
 end
 
 function love.load()
-	versionName = "v0.72"
+	versionName = "v0.78"
 	
 	width = love.graphics:getWidth()
 	height = love.graphics:getHeight()
@@ -74,8 +74,6 @@ function love.load()
 	tictactable = love.graphics.newCanvas(500,500)
 	extra = require("extra")
 	translate = require("translate")
-	drawPou = require("draw")
-drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 	bannerTime = 1234567
 	bannerType = "success"
 	bannerMsg = ""
@@ -124,7 +122,8 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 		b7 = love.graphics.newImage("assets/icons/button7.png"),
 		b8 = love.graphics.newImage("assets/icons/button8.png"),
 	}
-	
+	drawPou = require("draw")
+drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 	sounds = {
 		trouble = love.audio.newSource("assets/sounds/error.mp3","static"),
 		success = love.audio.newSource("assets/sounds/levelup.ogg","static"),
@@ -422,6 +421,20 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 		end
 	end
 	
+	function clickgame(id)
+		if id == 31 or id == 28 then return badState(translate:Get("noTop")) end
+		if id == 8 then
+			items.buttons.button7.func(items) return
+		elseif id == 9 then
+			items.buttons.button8.func(items) return
+		end
+		local _s,top = pcall(function() return _G.Client.topScores(id,extra.options.gtopday) end)
+		if _s then
+			updateTop(top,"topscores")
+		else badState("An error occurred")
+		end
+	end
+	
 	function changeHost(newHost)
 		local a = love.window.showMessageBox(translate:Get("warn"),translate:Get("newserver"),{"No","Yes!",escapebutton=1},"warning")
 		if a == 2 then
@@ -460,7 +473,7 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 	end
 	
 	function clickuser(i)
-		if state == "top" or state == "tictaclobby" or state == "guestbook" or state == "guestsend" or state == "userlist" then
+		if state == "top" or state == "tictaclobby" or state == "guestbook" or state == "guestsend" or state == "userlist" or state == "topscores" then
 			local _,__ = string.gsub(substate,"page","")
 			local mul = tonumber(_) or 1
 			mul = mul-1
@@ -482,7 +495,7 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 			if topLikes then
 				local _tab = topLikes.items[ps]
 				local id = _tab.i or _tab.sI or "undefined"
-				if state == "top" or state == "guestbook" or state == "userlist" then
+				if state == "top" or state == "guestbook" or state == "userlist" or state == "topscores" then
 					if id == account.id then visit() else local inf = _G.Client.getUserById(id) visit(inf) end
 				else
 					local a = _G.Client.getSession(id)
@@ -597,7 +610,7 @@ function love.update(dt)
 		items.texts.newMail.v = true items.texts.newMail.e = true
 		items.texts.newPass.v = true items.texts.newPass.e = true
 		items.texts.oldPass.v = true items.texts.oldPass.e = true
-	elseif state == "top" or state == "tictaclobby" or state == "guestbook" or state == "guestsend" or state == "userlist" then
+	elseif state == "top" or state == "tictaclobby" or state == "guestbook" or state == "guestsend" or state == "userlist" or state == "topscores" then
 		items.buttons.exit.v = false items.buttons.exit.e = true
 		local _,__ = string.gsub(substate,"page","")
 		local itCount = (state == "guestsend") and 18 or #topLikes.items --item count
@@ -626,6 +639,20 @@ function love.update(dt)
 		items.buttons.follows.v = true items.buttons.follows.e = true
 		items.buttons.visitors.v = true items.buttons.visitors.e = true
 		items.buttons.exit.v = false items.buttons.exit.e = true
+	elseif state == "topgame" then
+		items.buttons.exit.v = false items.buttons.exit.e = true
+		for a,b in pairs(items.buttons) do
+			if string.match(a,"pou_game") then
+				local count = string.gsub(a,"pou_game","")
+				--print(#topLikes.items,(num-1)*10+count,topLikes.items[(num-1)*10+count],num,a)
+				if 32 >= tonumber(count) then
+					b.e = true
+				end
+			end
+			if string.match(a,"gday") then
+				b.e = true
+			end
+		end
 	end
 end
 
@@ -675,7 +702,7 @@ function love.draw()
 		love.graphics.rectangle("fill",600,240-account.state.fun/2,50,account.state.fun/2)
 		sColor(account.state.sleep)
 		love.graphics.rectangle("fill",650,240-account.state.sleep/2,50,account.state.sleep/2)
-		love.graphics.setColor(0,0,0,1)
+		love.graphics.setColor(1,1,1,1)
 		love.graphics.draw(icons.hunger,500,190,0,50/icons.hunger:getWidth(),50/icons.hunger:getHeight())
 		love.graphics.draw(icons.hp,550,190,0,50/icons.hp:getWidth(),50/icons.hp:getHeight())
 		love.graphics.draw(icons.fun,600,190,0,50/icons.fun:getWidth(),50/icons.fun:getHeight())
@@ -718,7 +745,7 @@ function love.draw()
 		love.graphics.draw(icons.b3,items.buttons.button3.x,items.buttons.button3.y,0,items.buttons.button2.sx/icons.b3:getWidth(),items.buttons.button3.sy/icons.b3:getHeight())
 		love.graphics.draw(icons.b4,items.buttons.button4.x,items.buttons.button4.y,0,items.buttons.button2.sx/icons.b4:getWidth(),items.buttons.button4.sy/icons.b4:getHeight())
 		love.graphics.draw(icons.b5,items.buttons.button5.x,items.buttons.button5.y,0,items.buttons.button5.sx/icons.b5:getWidth(),items.buttons.button5.sy/icons.b5:getHeight())
-		--love.graphics.draw(icons.b6,items.buttons.button6.x,items.buttons.button6.y,0,items.buttons.button6.sx/icons.b6:getWidth(),items.buttons.button6.sy/icons.b6:getHeight())
+		love.graphics.draw(icons.b6,items.buttons.button6.x,items.buttons.button6.y,0,items.buttons.button6.sx/icons.b6:getWidth(),items.buttons.button6.sy/icons.b6:getHeight())
 		love.graphics.draw(icons.b7,items.buttons.button7.x,items.buttons.button7.y,0,items.buttons.button7.sx/icons.b7:getWidth(),items.buttons.button7.sy/icons.b7:getHeight())
 		love.graphics.draw(icons.b8,items.buttons.button8.x,items.buttons.button8.y,0,items.buttons.button8.sx/icons.b8:getWidth(),items.buttons.button8.sy/icons.b8:getHeight())
 		love.graphics.draw(icons.zakeh,items.buttons.zakehweb.x,items.buttons.zakehweb.y,0,items.buttons.zakehweb.sx/icons.zakeh:getWidth(),items.buttons.zakehweb.sy/icons.zakeh:getHeight())
@@ -732,7 +759,7 @@ function love.draw()
 		love.graphics.setColor(1,1,1,1)
 	elseif state == "search" then
 		love.graphics.draw(icons.home,items.buttons.exit.x,items.buttons.exit.y,0,items.buttons.exit.sx/icons.home:getWidth(),items.buttons.exit.sy/icons.home:getHeight())
-	elseif state == "top" or state == "tictaclobby" or state == "guestbook" or state == "guestsend" or state == "userlist" then
+	elseif state == "top" or state == "tictaclobby" or state == "guestbook" or state == "guestsend" or state == "userlist" or state == "topscores" then
 		love.graphics.draw(icons.home,items.buttons.exit.x,items.buttons.exit.y,0,items.buttons.exit.sx/icons.home:getWidth(),items.buttons.exit.sy/icons.home:getHeight())
 		--[[love.graphics.setColor(0.5,0.5,0.5,0.8)
 		love.graphics.rectangle("fill",170,130,470,450)
@@ -802,6 +829,9 @@ function love.draw()
 							love.graphics.print(string.format(translate:Get("book"..pou.tI),account.name),175+330*a,170+90*b)
 						elseif state == "userlist" then
 							love.graphics.print("Likes: ".. pou.nL,175+330*a,170+90*b)
+						elseif state == "topscores" then
+							love.graphics.print("Likes: ".. pou.nL,175+330*a,170+90*b)
+							love.graphics.print("Score: "..(pou.s or "Unknown"),175+330*a,185+90*b)
 						end
 						love.graphics.setColor(1,1,1,1)
 						if pou.iL==1 and pou.lM==1 then
@@ -889,6 +919,42 @@ function love.draw()
 		love.graphics.setFont(fonts.smolpou)
 		love.graphics.print(account.following,160-fonts.smolpou:getWidth(account.following)/2,255)
 		love.graphics.print(account.followers,320-fonts.smolpou:getWidth(account.followers)/2,255)
+	elseif state == "topgame" then
+		love.graphics.draw(icons.home,items.buttons.exit.x,items.buttons.exit.y,0,items.buttons.exit.sx/icons.home:getWidth(),items.buttons.exit.sy/icons.home:getHeight())
+		local siz = 90
+		for d=0,4,1 do
+			for c = 0,6,1 do
+				local pos = (c+1)+(7*d)
+				if pos <= #extra.games then
+					love.graphics.setColor(1,1,1,0.4)
+					love.graphics.rectangle("fill",85+siz*c,130+siz*d,siz,siz)
+					love.graphics.setColor(1,1,1,1)
+					love.graphics.rectangle("line",85+siz*c,130+siz*d,siz,siz)
+					local gamimg = extra.imgs["assets/icons/games/"..extra.games[pos]..".png"]
+					love.graphics.draw(gamimg,(85+siz*c)+siz/2,(130+siz*d)+siz/2,0,siz*0.9/gamimg:getWidth(),siz*0.9/gamimg:getWidth(),gamimg:getWidth()/2,gamimg:getHeight()/2)
+				end
+			end
+		end
+		love.graphics.setColor(1,1,1,0.3)
+		if extra.options.gtopday == "today" then
+			love.graphics.rectangle("fill",124,90,138,30)
+		elseif extra.options.gtopday == "week" then
+			love.graphics.rectangle("fill",262,90,138,30)
+		elseif extra.options.gtopday == "month" then
+			love.graphics.rectangle("fill",400,90,138,30)
+		elseif extra.options.gtopday == "alltime" then
+			love.graphics.rectangle("fill",538,90,138,30)
+		end
+		love.graphics.setColor(1,1,1,1)
+		love.graphics.setFont(fonts.def)
+		love.graphics.rectangle("line",124,90,138,30)
+		love.graphics.print(translate:Get("today"),193-fonts.def:getWidth(translate:Get("today"))/2,105-fonts.def:getHeight()/2)
+		love.graphics.rectangle("line",262,90,138,30)
+		love.graphics.print(translate:Get("week"),331-fonts.def:getWidth(translate:Get("week"))/2,105-fonts.def:getHeight()/2)
+		love.graphics.rectangle("line",400,90,138,30)
+		love.graphics.print(translate:Get("month"),469-fonts.def:getWidth(translate:Get("month"))/2,105-fonts.def:getHeight()/2)
+		love.graphics.rectangle("line",538,90,138,30)
+		love.graphics.print(translate:Get("alltime"),607-fonts.def:getWidth(translate:Get("alltime"))/2,105-fonts.def:getHeight()/2)
 	end
 	love.graphics.setColor(1,1,1,1)
 	love.graphics.setFont(fonts.def)

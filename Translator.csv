@@ -54,10 +54,27 @@ noUserEmpty;User not found;Usuario no encontrado;null
 baderror;An error has occured;Un error ha ocurrido;null
 goodstate;Success;Acción cumplida exitosamente;null
 searchmini;Search mini info (also works with banned accounts);Buscar mini información (también funciona con cuentas baneadas);null
-
-
-
-
+Bmypou;My Pou;Mi Pou;null
+Brandompou;Random;Aleatorio;null
+Bsearch;Search;Buscar;null
+Btoplikes;Top Likes;Top Seguidores;null
+Btopgames;Top Games;Top Juegos;null
+Btictac;Tic Tac Pou;Tic Tac Pou;null
+Bfourpous;Four Pous;Four Pous;null
+Bsettings;Settings;Configuración;null
+Bweb;Website;Sitio Web;null
+Btwit;Twitter;Twitter;null
+Binsta;Instagram;Instagram;null
+Bfaceb;Facebook;Facebook;null
+Bgit;GitHub;GitHub;null
+Bfollowers;Followers;Seguidores;null
+Bfollowing;Following;Siguiendo;null
+Bvisits;Visitors;Visitantes;null
+noTop;This game isn't supported.;Este juego no es compatible.;null
+today;Today;Hoy;null
+week;Weekly;Semanal;null
+month;Monthly;Mensual;null
+alltime;All time;Todos los tiempos;null
 
 
 

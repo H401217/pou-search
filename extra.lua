@@ -15,6 +15,45 @@ module.fixNum = function(num,min,max)
 	if num < min then num = min elseif num > max then num = max end return num
 end
 
+module.options = {
+	gtopday = "today",
+}
+
+module.games = {
+	[1] = "Food Drop",
+	[2] = "Sky Jump",
+	[3] = "Free Fall",
+	[4] = "Color Match",
+	[5] = "Sad Tap",
+	[6] = "Pou Sounds",
+	[7] = "Pou Popper",
+	[8] = "Tic Tac Pou",
+	[9] = "Four Pous",
+	[10] = "Find Pou",
+	[11] = "Match Tap",
+	[12] = "Color Tap",
+	[13] = "Memory",
+	[14] = "Connect",
+	[15] = "Goal",
+	[16] = "Cloud Pass",
+	[17] = "Cliff Jump",
+	[18] = "Pool",
+	[19] = "Water Hop",
+	[20] = "Sky Hop",
+	[21] = "Hill Drive",
+	[22] = "Cliff Dash",
+	[23] = "Word Find",
+	[24] = "Pet Walk",
+	[25] = "Jet Pou",
+	[26] = "Hoops",
+	[27] = "Tumble",
+	[28] = "Sudoku",
+	[29] = "Star Popper",
+	[30] = "Food Swap",
+	[31] = "Beach Volley",
+	[32] = "Connect 2",
+}
+
 module.versions = { --unaccurate, probably will be used later
 	[256] = "1.4.107",
 	[255] = "1.4.106",

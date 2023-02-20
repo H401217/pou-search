@@ -1,4 +1,10 @@
 # Pou Search Changelog
+## v0.78
+* Added flood fill (for pou body color)
+* Added eye colors
+* Added Top score button
+* Added more tooltips
+* Removed buttons names
 ## v0.72
 * JSON bug fix (missing quotes)
 * Added visitors button
