@@ -5,3 +5,19 @@
 3. Unzip the downloaded file
 4. Zip the contents of the folder and rename extension from .zip to .love
 5. To open file, double click on it (if installed) or drag the file to love.exe
+## Custom servers
+This application gets (optional) metadata from custom server at "ajax/site/meta":
+```json
+{
+	"name":"My server",
+	"description":"My custom server",
+	"image":"base64 image",
+	"creator":98,
+	"links":{
+		"facebook":"faceusername",
+		"instagram":"instauser",
+		"twitter":"twitteruser",
+		"web":"http://www.example.com"
+	}
+}
+```

@@ -42,6 +42,7 @@ mod.buttons = {
 	likes = {v=true,e=true,x=270,y=150,sx=100,sy=100,func=function(self) updateTop(_G.Client.getLikers(account.id,0),"userlist") end, img="assets/icons/likes_button.png",hint="Bfollowers"},
 	follows = {v=true,e=true,x=110,y=150,sx=100,sy=100,func=function(self) updateTop(_G.Client.getFavorites(account.id,0),"userlist") end, img="assets/icons/follows_button.png",hint="Bfollowing"},
 	visitors = {v=true,e=true,x=430,y=150,sx=100,sy=100,func=function(self) updateTop(_G.Client.getVisitors(account.id,0),"userlist") end, img="assets/icons/visits_button.png",hint="Bvisits"},
+	states = {v=true,e=true,x=580,y=150,sx=100,sy=100,func=function(self) love.window.showMessageBox("",string.format(translate:Get("stats"),(account.stats.nEF or 0),(account.stats.cS or 0)+(account.stats.cW or 0),(account.stats.hFP or 0),(account.stats.eFS or 0),(account.stats.eFP or 0),(account.stats.wF or 0),(account.stats.wFF or 0)),"info") end,img="assets/icons/stats_button.png",hint="userstatus"},
 	guestbook = {v=true,e=true,x=650,y=262.5,sx=50,sy=50,func=function(self) getMsgs(account.id) end, img="assets/icons/guestbook.png"},
 	gbmenu = {v=false,e=true,x=90,y=83,sx=620,sy=42,func=function(self) state = "guestsend" substate="page1" end},
 	sNick = {v=true,e=true,x=330,y=170,sx=50,sy=50,func=function(self) visit(_G.Client.getUserByNickname(self.texts.sNick.text)) end,img="assets/icons/search.png"},

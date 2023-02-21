@@ -75,6 +75,7 @@ today;Today;Hoy;null
 week;Weekly;Semanal;null
 month;Monthly;Mensual;null
 alltime;All time;Todos los tiempos;null
-
+userstatus;Stats;Estadísticas;null
+stats;Feeded %s times\nBathed %s times\nHealed %s times\nSlept %s times\nGiven energy via potion %s times\nWatered own flowers %s times\nWatered others flowers %s times;Alimentado %s veces\nLimpiado %s veces\nCurado %s veces\nDurmió %s veces\nDio energía con poción %s veces\nRegó %s veces sus flores\nRegó %s veces flores de otros;null
 
 

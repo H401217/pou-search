@@ -8,7 +8,15 @@
                                                       
 Pou Search is an open source project in GitHub (https://github.com/H401217/pou-search).
 ]]
-
+--[[nEF hunger (no potion)
+cS bath
+cW withered (probably old version)
+hFP heal
+eFS ?sleep normal
+eFP potion sleep
+wF flower local
+wFF flower visit
+if you read this then i forgot to delete this]]
 function love.run()
 	love.graphics.origin() love.graphics.draw(love.graphics.newImage("assets/icons/splashscreen.png")) love.graphics.present()
 	if love.load then love.load(love.arg.parseGameArguments(arg), arg) end
@@ -64,7 +72,7 @@ function sColor(p)
 end
 
 function love.load()
-	versionName = "v0.78"
+	versionName = "v0.79"
 	
 	width = love.graphics:getWidth()
 	height = love.graphics:getHeight()
@@ -150,6 +158,8 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 		lvl = 22,
 		isFollowing = false,
 		isFollowed = false,
+		type="normal",
+		stats={},
 		state = {
 			food = 10,
 			hp = 100,
@@ -266,6 +276,7 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 		account.state.hp = tab.state.health or 100
 		account.state.fun = tab.state.fun or 100
 		account.state.sleep = tab.state.energy or 100
+		account.stats = tab.state.stats or {}
 		account.lvl = (tab.state.lvl or 0)
 		account.xp = tab.state.xp or 0
 		account.vV = tab.version or 0
@@ -422,12 +433,7 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 	end
 	
 	function clickgame(id)
-		if id == 31 or id == 28 then return badState(translate:Get("noTop")) end
-		if id == 8 then
-			items.buttons.button7.func(items) return
-		elseif id == 9 then
-			items.buttons.button8.func(items) return
-		end
+		--if id == 31 or id == 28 then return badState(translate:Get("noTop")) end if id == 8 then items.buttons.button7.func(items) return elseif id == 9 then items.buttons.button8.func(items) return end
 		local _s,top = pcall(function() return _G.Client.topScores(id,extra.options.gtopday) end)
 		if _s then
 			updateTop(top,"topscores")
@@ -638,6 +644,7 @@ function love.update(dt)
 		items.buttons.likes.v = true items.buttons.likes.e = true
 		items.buttons.follows.v = true items.buttons.follows.e = true
 		items.buttons.visitors.v = true items.buttons.visitors.e = true
+		items.buttons.states.v = true items.buttons.states.e = true
 		items.buttons.exit.v = false items.buttons.exit.e = true
 	elseif state == "topgame" then
 		items.buttons.exit.v = false items.buttons.exit.e = true

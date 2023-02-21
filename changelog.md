@@ -1,5 +1,6 @@
 # Pou Search Changelog
-## v0.78
+## v0.79
+* Added player stats button (user menu)
 * Added flood fill (for pou body color)
 * Added eye colors
 * Added Top score button

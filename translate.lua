@@ -43,7 +43,7 @@ function mod:Get(key)
 	if v1 then
 		local a = mainlang[self.lang][v1]
 		if a then 
-			return a
+			return string.gsub(a,"\\n","\n")
 		else
 			return key
 		end
