@@ -1,4 +1,7 @@
 # Pou Search Changelog
+## v0.8
+* Added player social stats (likes and favorites)
+* Added Portuguese (Brazil) (by [u/oesky](https://www.reddit.com/u/oesky) )
 ## v0.79
 * Added player stats button (user menu)
 * Added flood fill (for pou body color)

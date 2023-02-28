@@ -1,4 +1,78 @@
 _G.cookie = ""
+
+local likeUpdateThread = love.thread.newThread([[
+	local looped = true
+	local function End(ms)
+		love.thread.getChannel("likeupdate"):push("ended-"..ms)
+		looped = false
+	end
+	local function split(add)
+		local sec,hos = false,nil
+		local _1 = string.find(add,":")
+		if _1 then
+			local _s1 = string.sub(add,0,_1-1) or "http"
+			sec = (_s1=="https") and (443) or (80)
+		end
+		local __,_2 = string.find(add,"://")
+		if _2 then
+			local _3 = string.find(add,"/",_2+1) or #add+1
+			local _s2 = string.sub(add,_2+1,_3-1) or "app.pou.me"
+			hos = _s2
+		end
+		return sec,hos
+	end
+	
+	local host,cookie,pname,mynam = ...
+	local path = "/ajax/search/friend_by_nickname?n="..pname.."&_r=256&_a=1&_c=1&_v=4"
+	if string.lower(pname)==string.lower(mynam) then
+		path = "/ajax/account/info?_r=256&_a=1&_c=1&_v=4"
+	end
+	local socket = require("socket")
+	local sec,hos = split(host)
+	local tcp = socket.tcp()
+	local address = socket.dns.toip(hos)
+	if not pname then return End("no-name") end
+	if not address then return End("no-address") end
+	--if sec == 443 then return End("https-not-supported") end
+	tcp:connect(address,sec)
+	tcp:settimeout(5)
+	local timer = -10
+	while looped do
+		local msgs = love.thread.getChannel("tolikeupdate"):pop()
+		if msgs then
+			if msgs == "close" then print("bye") tcp:close() End("ok") break end
+		end
+		if os.clock()-timer > 10 then
+			tcp:send("GET "..path.." HTTP/1.1\nHost:"..hos.."\nUser-Agent:Pou-Searcher\nConnection:Keep-Alive\nCookie:"..cookie.."\n\n")
+			local finres = ""
+			local body = ""
+			local function getchunk(heads)
+				local resp
+				while 1 do
+					resp = tcp:receive()
+					if resp then
+						if tonumber(resp,16) then
+							break
+						end
+						finres = finres..resp..((heads==true) and "\n" or "")
+					else return
+					end
+				end
+				local res = tcp:receive(tonumber(resp,16)) or ""
+				if #res>0 then
+					finres = finres..res
+					body = body..res
+					getchunk()
+				end
+			end
+			getchunk(true)
+			love.thread.getChannel("likeupdate"):push(body)
+			timer=os.clock()
+		end
+		socket.sleep(0.1)
+	end
+]])
+
 local socket = require('socket.http')
 local json = require("json")
 local ltn12 = require('ltn12')
@@ -63,6 +137,12 @@ pou.changeHost = function(url)
 	host = url
 	local a,b = pcall(function() return get("/ajax/site/meta?amogus=111") end)
 	if a == true then return b else return nil end
+end
+
+pou.startLive = function(name)
+	live_stats.followsum = {0}
+	live_stats.likesum = {0}
+	likeUpdateThread:start(host,_G.cookie,name,myacc.name)
 end
 
 pou.login = function(email, pass)

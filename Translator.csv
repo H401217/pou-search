@@ -1,81 +1,80 @@
-Key;en;es;null
-currentLang;English;Español;null
-newserver;Changing host will close your current Pou account! Are you sure to continue?;¡Cambiar de servidor cerrará tu cuenta de Pou actual! ¿Estás seguro de continuar?;null
-no-meta;Metadata for custom server {host} not found!;¡Los metadatos para el servidor personalizado {host} no han sido encontrados!;null
-warn;Warning!;¡Advertencia!;null
-opNick;Change Nickname;Cambiar Apodo;null
-opMail;Change Email;Cambiar Correo;null
-opPass;Change Password;Cambiar Contraseña;null
-opHost;Change Server;Cambiar Servidor;null
-lastlog;Last logged %s ago;Última vez logueado hace %s;null
-tS;seconds;segundos;null
-tM;minutes;minutos;null
-tH;hours;horas;null
-tD;days;días;null
-book1;Hello %s!;¡Hola %s!;null
-book2;How are you?;¿Cómo estás?;null
-book3;I'm fine, thank you!;Estoy bien, gracias;null
-book4;You're cute! ^_^;¡Eres muy dulce! ^_^;null
-book5;Nice house!;¡Bonita casa!;null
-book6;Nice clothes!;¡Bonita ropa!;null
-book7;Nice ball!;¡Bonita bola!;null
-book8;Nice achievements!;¡Buenos logros!;null
-book9;I like you! ^_^;¡Me gustas! ^_^;null
-book10;Let's be friends!;¡Seamos amigos!;null
-book11;Thanks for liking me!;¡Gracias por darme like!;null
-book12;Let's play together!;¡Juguemos juntos!;null
-book13;Congratulations!;¡Felicidades!;null
-book14;Thank you! ^_^;¡Gracias! ^_^;null
-book15;Have a nice day!;¡Ten un buen día!;null
-book16;Good night! Zzz;¡Buenas noches! Zzz;null
-book17;Nice garden!;¡Bonito jardín!;null
-book18;Nice car!;¡Bonito coche!;null
-booknew;New message;Nuevo mensaje;null
-matchturn;%s's turn;Turno de %s;null
-matchUturn;Your turn;Tu turno;null
-matchtie;Nobody wins;Nadie gana;null
-matchlose;%s wins;%s gana;null
-matchwin;You win!;¡Tú ganas!;null
-badmail;Invalid Email!;Correo Invalido;null
-changepass;Changed pass!;¡Contraseña cambiada!;null
-changemail;Changed e-mail to '%s';Correo cambiado a '%s';null
-changename;Changed nickname to '%s';Apodo cambiado a '%s';null
-IncorrectPassword;Incorrect Password;Contraseña Incorrecta;null
-NicknameNotAvailable;The nickname is not available for registration.;El apodo no esta disponible.;null
-EmailAlreadyRegistered;The e-mail is already registered.;El correo ya estaba registrado.;null
-UserNotLoggedIn;You need to login to continue.;Debes iniciar sesión para continuar.;null
-MissingArgument;Missing argument value for %s;Valor faltante para '%s';null
-InvalidArgumentFormat;Invalid value for e-mail;Valor incorrecto para el correo;null
-IncorrectUserCredentials;Incorrect user credentials.;Credenciales incorrectas;null
-ObjectNotFound;%s not found: '%s';'%s' no encontrado: '%s';null
-UserBanned;User banned;Usuario baneado;null
-UserIsMe;You cannot do that to yourself.;No puedes hacer esto a ti mismo.;null
-noUserEmpty;User not found;Usuario no encontrado;null
-baderror;An error has occured;Un error ha ocurrido;null
-goodstate;Success;Acción cumplida exitosamente;null
-searchmini;Search mini info (also works with banned accounts);Buscar mini información (también funciona con cuentas baneadas);null
-Bmypou;My Pou;Mi Pou;null
-Brandompou;Random;Aleatorio;null
-Bsearch;Search;Buscar;null
-Btoplikes;Top Likes;Top Seguidores;null
-Btopgames;Top Games;Top Juegos;null
-Btictac;Tic Tac Pou;Tic Tac Pou;null
-Bfourpous;Four Pous;Four Pous;null
-Bsettings;Settings;Configuración;null
-Bweb;Website;Sitio Web;null
-Btwit;Twitter;Twitter;null
-Binsta;Instagram;Instagram;null
-Bfaceb;Facebook;Facebook;null
-Bgit;GitHub;GitHub;null
-Bfollowers;Followers;Seguidores;null
-Bfollowing;Following;Siguiendo;null
-Bvisits;Visitors;Visitantes;null
-noTop;This game isn't supported.;Este juego no es compatible.;null
-today;Today;Hoy;null
-week;Weekly;Semanal;null
-month;Monthly;Mensual;null
-alltime;All time;Todos los tiempos;null
-userstatus;Stats;Estadísticas;null
-stats;Feeded %s times\nBathed %s times\nHealed %s times\nSlept %s times\nGiven energy via potion %s times\nWatered own flowers %s times\nWatered others flowers %s times;Alimentado %s veces\nLimpiado %s veces\nCurado %s veces\nDurmió %s veces\nDio energía con poción %s veces\nRegó %s veces sus flores\nRegó %s veces flores de otros;null
-
-
+Key;en;es;pt-br;null
+currentLang;English;Español;Português\n(Brasil);null
+newserver;Changing host will close your current Pou account! Are you sure to continue?;¡Cambiar de servidor cerrará tu cuenta de Pou actual! ¿Estás seguro de continuar?;Mudar o servidor vai desconectar a sua conta atual do Pou! Tem certeza que quer continuar?;null
+no-meta;Metadata for custom server "%s" not found!;¡Los metadatos para el servidor personalizado "%s" no han sido encontrados!;Os dados pro servidor personalizado "%s" não foram encontrados!;null
+warn;Warning!;¡Advertencia!;Aviso!;null
+opNick;Change Nickname;Cambiar Apodo;Mudar apelido;null
+opMail;Change Email;Cambiar Correo;Mudar email;null
+opPass;Change Password;Cambiar Contraseña;Mudar senha;null
+opHost;Change Server;Cambiar Servidor;Mudar servidor;null
+lastlog;Last logged %s ago;Última vez logueado hace %s;Última vez logado fazem %s atrás;null
+tS;seconds;segundos;segundos;null
+tM;minutes;minutos;minutos;null
+tH;hours;horas;horas;null
+tD;days;días;dias;null
+book1;Hello %s!;¡Hola %s!;Oi %s!;null
+book2;How are you?;¿Cómo estás?;Tudo bem?;null
+book3;I'm fine, thank you!;Estoy bien, gracias;Tô bem, obrigado!;null
+book4;You're cute! ^_^;¡Eres muy dulce! ^_^;Muito amável! ^_^;null
+book5;Nice house!;¡Bonita casa!;Que casa legal!;null
+book6;Nice clothes!;¡Bonita ropa!;Que roupa bonita!;null
+book7;Nice ball!;¡Bonita bola!;Que bola legal!;null
+book8;Nice achievements!;¡Buenos logros!;Sucesso!;null
+book9;I like you! ^_^;¡Me gustas! ^_^;Gosto de você! ^_^;null
+book10;Let's be friends!;¡Seamos amigos!;Vamos ser amigos!;null
+book11;Thanks for liking me!;¡Gracias por darme like!;Obrigado por gostar de mim!;null
+book12;Let's play together!;¡Juguemos juntos!;Vamos brincar juntos!;null
+book13;Congratulations!;¡Felicidades!;Parabéns!;null
+book14;Thank you! ^_^;¡Gracias! ^_^;Obrigado! ^_^;null
+book15;Have a nice day!;¡Ten un buen día!;Bom dia!;null
+book16;Good night! Zzz;¡Buenas noches! Zzz;Boa noite! Zzz;null
+book17;Nice garden!;¡Bonito jardín!;Belo jardim!;null
+book18;Nice car!;¡Bonito coche!;Que carro legal!;null
+booknew;New message;Nuevo mensaje;Nova mensagem;null
+matchturn;%s's turn;Turno de %s;Vez de %s;null
+matchUturn;Your turn;Tu turno;Sua vez;null
+matchtie;Nobody wins;Nadie gana;Ninguém ganhou;null
+matchlose;%s wins;%s gana;%s ganhou;null
+matchwin;You win!;¡Tú ganas!;Você ganhou!;null
+badmail;Invalid Email!;Correo Invalido;Email incorreto;null
+changepass;Changed pass!;¡Contraseña cambiada!;Senha incorreta;null
+changemail;Changed e-mail to '%s';Correo cambiado a '%s';Email alterado pra '%s';null
+changename;Changed nickname to '%s';Apodo cambiado a '%s';Apelido alterado pra '%s';null
+IncorrectPassword;Incorrect Password;Contraseña Incorrecta;Senha incorreta;null
+NicknameNotAvailable;The nickname is not available for registration.;El apodo no esta disponible.;O apelido não está disponível.;null
+EmailAlreadyRegistered;The e-mail is already registered.;El correo ya estaba registrado.;O email já estava registrado.;null
+UserNotLoggedIn;You need to login to continue.;Debes iniciar sesión para continuar.;Você precisa fazer login pra continuar.;null
+MissingArgument;Missing argument value for %s;Valor faltante para '%s';Valor insuficiente pra '%s';null
+InvalidArgumentFormat;Invalid value for e-mail;Valor incorrecto para el correo;Formato de email incorreto;null
+IncorrectUserCredentials;Incorrect user credentials.;Credenciales incorrectas;Credenciais incorretas;null
+ObjectNotFound;%s not found: '%s';'%s' no encontrado: '%s';'%s' não encontrado: '%s';null
+UserBanned;User banned;Usuario baneado;Usuário banido;null
+UserIsMe;You cannot do that to yourself.;No puedes hacer esto a ti mismo.;Você não pode fazer isso a si mesmo;null
+noUserEmpty;User not found;Usuario no encontrado;Usuário não encontrado;null
+baderror;An error has occured;Un error ha ocurrido;Ocorreu um erro;null
+goodstate;Success;Acción cumplida exitosamente;Ação feita com êxito;null
+searchmini;Search mini info (also works with banned accounts);Buscar mini información (también funciona con cuentas baneadas);Pesquisar informações curtas (também funciona com contas banidas);null
+Bmypou;My Pou;Mi Pou;Meu Pou;null
+Brandompou;Random;Aleatorio;Aleatório;null
+Bsearch;Search;Buscar;Pesquisar;null
+Btoplikes;Top Likes;Top Seguidores;TopLikes;null
+Btopgames;Top Games;Top Juegos;TopScore Jogos;null
+Btictac;Tic Tac Pou;Tic Tac Pou;Tic Tac Pou;null
+Bfourpous;Four Pous;Four Pous;Four Pous;null
+Bsettings;Settings;Configuración;Configurações;null
+Bweb;Website;Sitio Web;Site Web;null
+Btwit;Twitter;Twitter;Twitter;null
+Binsta;Instagram;Instagram;Instagram;null
+Bfaceb;Facebook;Facebook;Facebook;null
+Bgit;GitHub;GitHub;GitHub;null
+Bfollowers;Followers;Seguidores;Likes;null
+Bfollowing;Following;Siguiendo;Favoritos;null
+Bvisits;Visitors;Visitantes;Visitantes;null
+Blivestats;Stats;Estadísticas;Estatísticas;null
+noTop;This game isn't supported.;Este juego no es compatible.;Esse jogo não é compatível.;null
+today;Today;Hoy;Hoje;null
+week;Weekly;Semanal;Por semana;null
+month;Monthly;Mensual;Por mês;null
+alltime;All time;Todo el Tiempo;Todos os tempos;null
+userstatus;Game stats;Estadísticas de juego;Estatísticas de jogo;null
+stats;Feeded %s times\nBathed %s times\nHealed %s times\nSlept %s times\nGiven energy via potion %s times\nWatered own flowers %s times\nWatered others flowers %s times;Alimentado %s veces\nLimpiado %s veces\nCurado %s veces\nDurmió %s veces\nDio energía con poción %s veces\nRegó %s veces sus flores\nRegó %s veces flores de otros;Comeu %s vezes\nTomou banho %s vezes\nCurado %s vezes\nDormiu %s vezes\nEnergizado por porção %s vezes\nRegou %s suas próprias flores\nRegou %s vezes flores de outros usuários;null

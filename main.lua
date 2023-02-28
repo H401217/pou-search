@@ -8,15 +8,7 @@
                                                       
 Pou Search is an open source project in GitHub (https://github.com/H401217/pou-search).
 ]]
---[[nEF hunger (no potion)
-cS bath
-cW withered (probably old version)
-hFP heal
-eFS ?sleep normal
-eFP potion sleep
-wF flower local
-wFF flower visit
-if you read this then i forgot to delete this]]
+
 function love.run()
 	love.graphics.origin() love.graphics.draw(love.graphics.newImage("assets/icons/splashscreen.png")) love.graphics.present()
 	if love.load then love.load(love.arg.parseGameArguments(arg), arg) end
@@ -72,13 +64,14 @@ function sColor(p)
 end
 
 function love.load()
-	versionName = "v0.79"
+	versionName = "v0.8"
 	
 	width = love.graphics:getWidth()
 	height = love.graphics:getHeight()
 	
 	pouvisit = love.graphics.newCanvas(100,100)
 	minipou = love.graphics.newCanvas(100,100)
+	statspou = love.graphics.newCanvas(100,100)
 	tictactable = love.graphics.newCanvas(500,500)
 	extra = require("extra")
 	translate = require("translate")
@@ -171,6 +164,15 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 	}
 	myacc = {
 		id = 0,
+		name = "",
+	}
+	live_stats = {
+		name = "[Unnamed]",
+		id = 0,
+		following = 0,
+		likesum = {0},
+		followers = 0,
+		followsum = {0},
 	}
 	server = {
 		name = "Pou",
@@ -202,7 +204,7 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 	function updateServer(js,host)
 		print(js,host,"dos")
 		local _,t = pcall(function() return drawPou.toTable(js) end)
-		if type(t) ~= "table" then t = {} love.window.showMessageBox(translate:Get("warn"),"Metadata for custom server '"..host.."' not found!","warning") end
+		if type(t) ~= "table" then t = {} love.window.showMessageBox(translate:Get("warn"),string.format(translate:Get("no-meta"),tostring(host)),"warning") end
 		server.name = t.name or "Unnamed"
 		server.description = t.description or ""
 		server.image = t.image or "iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAIAAAD9iXMrAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAnSURBVChTYyAB1BMChNVtfSYLJAmrgwCoOmIBVBduQFjdCHUfAwMAXG6UCb238f8AAAAASUVORK5CYII="
@@ -216,7 +218,8 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 	
 	function meUpdate(str)
 		local js = drawPou.toTable(str)
-		myacc = js.i or 0
+		myacc.id = js.i or 0
+		myacc.name = js.n or ""
 	end
 
 	function userChange(option,arg1,arg2)
@@ -265,9 +268,13 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 	
 	function updateUser(tab,isMini)
 		account.id = tab.i
+		live_stats.id = tab.i
 		account.name = tab.n
+		live_stats.name	= tab.n
 		account.following = tab.nF
+		live_stats.following = tab.nF
 		account.followers = tab.nL
+		live_stats.followers = tab.nL
 		account.isFollowing = tab.iL
 		account.isFollowed = tab.lM
 		tab.state = tab.state or {}
@@ -288,6 +295,7 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 		account.state.cE = tonumber(ext2.s)
 		account.type = (isMini) and "mini" or "normal"
 		drawPou:drawPou(pouvisit,drawPou:toDrawer( isMini and tab.minI or (tab.state) ))
+		drawPou:drawPou(statspou,drawPou:toDrawer( isMini and tab.minI or (tab.state) ))
 	end
 	
 	function login(e,p,isdata)
@@ -645,6 +653,7 @@ function love.update(dt)
 		items.buttons.follows.v = true items.buttons.follows.e = true
 		items.buttons.visitors.v = true items.buttons.visitors.e = true
 		items.buttons.states.v = true items.buttons.states.e = true
+		items.buttons.livestats.v = true items.buttons.livestats.e = true
 		items.buttons.exit.v = false items.buttons.exit.e = true
 	elseif state == "topgame" then
 		items.buttons.exit.v = false items.buttons.exit.e = true
@@ -658,6 +667,25 @@ function love.update(dt)
 			end
 			if string.match(a,"gday") then
 				b.e = true
+			end
+		end
+	elseif state == "livestats" then
+		items.buttons.exit.v = false items.buttons.exit.e = true
+	end
+	local likeupdatestr = love.thread.getChannel("likeupdate"):pop()
+	if likeupdatestr then
+		local _s,tab = pcall(function() return drawPou.toTable(likeupdatestr) end)
+		if _s then
+			if #live_stats.likesum >= 15 then table.remove(live_stats.likesum,1) end
+			if #live_stats.followsum >= 15 then table.remove(live_stats.followsum,1) end
+			table.insert(live_stats.likesum,tab.nL-live_stats.followers)
+			table.insert(live_stats.followsum,tab.nF-live_stats.following)
+			live_stats.id = tab.i
+			live_stats.name = tab.n
+			live_stats.followers = tab.nL
+			live_stats.following = tab.nF
+			if tab.minI then
+				drawPou:drawPou(statspou,drawPou:toDrawer(tab.minI))
 			end
 		end
 	end
@@ -899,7 +927,7 @@ function love.draw()
 		love.graphics.setFont(fonts.medpou)
 		love.graphics.print("About Pou Search "..versionName,110,160)
 		love.graphics.setFont(fonts.smolpou)
-		love.graphics.print("'Pou Search' is an open source project in GitHub.\n(https://github.com/H401217/pou-search)\n\nCredits to:\n** Zakeh (Paul Salameh): Creator of Pou videogame\n** rxi: Creator of json.lua\n	(https://github.com/rxi/json.lua)",110,220)
+		love.graphics.print("'Pou Search' is an open source project in GitHub.\n(https://github.com/H401217/pou-search)\n\nCredits to:\n** Zakeh (Paul Salameh): Creator of Pou videogame\n** rxi: Creator of json.lua\n	(https://github.com/rxi/json.lua)\n**u/oesky: Brazilian Portuguese translation\n	(https://www.reddit.com/u/oesky)",110,220)
 		love.graphics.setFont(fonts.def)
 	elseif state == "login" then
 		love.graphics.draw(icons.home,items.buttons.exit.x,items.buttons.exit.y,0,items.buttons.exit.sx/icons.home:getWidth(),items.buttons.exit.sy/icons.home:getHeight())
@@ -962,6 +990,65 @@ function love.draw()
 		love.graphics.print(translate:Get("month"),469-fonts.def:getWidth(translate:Get("month"))/2,105-fonts.def:getHeight()/2)
 		love.graphics.rectangle("line",538,90,138,30)
 		love.graphics.print(translate:Get("alltime"),607-fonts.def:getWidth(translate:Get("alltime"))/2,105-fonts.def:getHeight()/2)
+	elseif state == "livestats" then
+		love.graphics.draw(icons.home,items.buttons.exit.x,items.buttons.exit.y,0,items.buttons.exit.sx/icons.home:getWidth(),items.buttons.exit.sy/icons.home:getHeight())
+		love.graphics.draw(statspou,400,80,0,1,1,50,0)
+		love.graphics.setFont(fonts.smolpou)
+		love.graphics.print("Followers",400-fonts.smolpou:getWidth("Followers")/2,310)
+		love.graphics.print("Following",90,350)
+		love.graphics.print("ID:",90,420)
+		love.graphics.setFont(fonts.medpou)
+		love.graphics.print(live_stats.name,400-fonts.medpou:getWidth(live_stats.name)/2,185)
+		love.graphics.print(live_stats.following,90,370)
+		love.graphics.print(live_stats.id,90,440)
+		love.graphics.setFont(fonts.pou)
+		love.graphics.print(live_stats.followers,400-fonts.pou:getWidth(live_stats.followers)/2,230)
+		
+		local function cl(tab)
+			local a = math.max(unpack(tab)) a=(a>1) and a or 1
+			local b = math.max(unpack(tab)) b=(b<-1) and b or -1
+			return a,b
+		end
+		local function calc(tab1,x,y,sx,sy)
+			local likemax,likemin = cl(tab1)
+			local liketab = {x,y+sy/2}
+			for i,v in pairs(tab1) do
+				table.insert(liketab,x+((i/#tab1)*sx))
+				if v >= 0 then
+					table.insert(liketab,(y+sy/2)+((v/likemax)*((sy/2)*-1)))
+				else
+					table.insert(liketab,(y+sy/2)+((v/likemin)*(sy/2)))
+				end
+			end
+			return liketab
+		end
+		local function col(val)
+			if val==0 then
+				return 0.2,0.2,0.2,1
+			elseif val > 0 then
+				return 0,1,0,1
+			else
+				return 1,0,0,1
+			end
+		end
+		local calc1,calc2 = calc(live_stats.likesum,500,350,220,100),calc(live_stats.followsum,500,470,220,100)
+		love.graphics.setColor(col(live_stats.likesum[#live_stats.likesum]))
+		love.graphics.line(calc1)
+		love.graphics.setColor(col(live_stats.followsum[#live_stats.followsum]))
+		love.graphics.line(calc2)
+		love.graphics.setColor(1,1,1,1)
+		love.graphics.setPointSize(3) love.graphics.points(calc1) love.graphics.points(calc2) love.graphics.setPointSize(1)
+		love.graphics.setFont(fonts.def)
+		love.graphics.rectangle("line",499,349,222,102)
+		local l1,l2 = cl(live_stats.likesum)
+		love.graphics.print(l1,723,350)
+		love.graphics.print(l2,723,450-fonts.def:getHeight())
+		love.graphics.rectangle("line",499,469,222,102)
+		local l3,l4 = cl(live_stats.followsum)
+		love.graphics.print(l3,723,470)
+		love.graphics.print(l4,723,570-fonts.def:getHeight())
+		love.graphics.print("+Followers",500,451)
+		love.graphics.print("+Following",500,571)
 	end
 	love.graphics.setColor(1,1,1,1)
 	love.graphics.setFont(fonts.def)

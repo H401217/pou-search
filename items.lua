@@ -22,7 +22,7 @@ mod.texts = {
 mod.buttons = {
 	--test = {v=true,e=true,x=300,y=20,sx=200,sy=50,func=function(self) print("hay") end}
 	login = {v=true,e=true,x=300,y=400,sx=200,sy=50,func=function(self) login(self.texts.mail.text,self.texts.pass.text) end},
-	exit = {v=true,e=true,x=30,y=100,sx=40,sy=40,func=function(self) if configchanged==true then relogin() configchanged=false end if state == "guestbook" or state == "usermenu" or state == "guestsend" or state == "usermenu" then state = "visit" elseif state == "userlist" then state = "usermenu" elseif state == "topscores" then state="topgame" else state = "home" substate = "" end end, img="assets/icons/home.png"},
+	exit = {v=true,e=true,x=30,y=100,sx=40,sy=40,func=function(self) if configchanged==true then relogin() configchanged=false end if state == "guestbook" or state == "usermenu" or state == "guestsend" or state == "usermenu" then state = "visit" elseif state == "userlist" then state = "usermenu" elseif state == "topscores" then state="topgame" elseif state == "livestats" then love.thread.getChannel("tolikeupdate"):push("close") state="usermenu" else state = "home" substate = "" end end, img="assets/icons/home.png"},
 	button = {v=true,e=true,x=515,y=555,sx=40,sy=40,func=function(self) relogin() end, img="assets/icons/refresh.png"}, --refresh
 	button0 = {v=true,e=true,x=0,y=550,sx=100,sy=50,func=function(self) if _G.Client.type == "guest" then state = "login" else logout() end end},
 	button1 = {v=false,e=true,x=110,y=150,sx=100,sy=100,func=function(self) visit() end, img="assets/icons/button1.png",hint="Bmypou"},
@@ -43,6 +43,7 @@ mod.buttons = {
 	follows = {v=true,e=true,x=110,y=150,sx=100,sy=100,func=function(self) updateTop(_G.Client.getFavorites(account.id,0),"userlist") end, img="assets/icons/follows_button.png",hint="Bfollowing"},
 	visitors = {v=true,e=true,x=430,y=150,sx=100,sy=100,func=function(self) updateTop(_G.Client.getVisitors(account.id,0),"userlist") end, img="assets/icons/visits_button.png",hint="Bvisits"},
 	states = {v=true,e=true,x=580,y=150,sx=100,sy=100,func=function(self) love.window.showMessageBox("",string.format(translate:Get("stats"),(account.stats.nEF or 0),(account.stats.cS or 0)+(account.stats.cW or 0),(account.stats.hFP or 0),(account.stats.eFS or 0),(account.stats.eFP or 0),(account.stats.wF or 0),(account.stats.wFF or 0)),"info") end,img="assets/icons/stats_button.png",hint="userstatus"},
+	livestats = {v=true,e=true,x=110,y=310,sx=100,sy=100,func=function(self) state = "livestats" _G.Pou.startLive(account.name) end,img="assets/icons/live_button.png",hint="Blivestats"},
 	guestbook = {v=true,e=true,x=650,y=262.5,sx=50,sy=50,func=function(self) getMsgs(account.id) end, img="assets/icons/guestbook.png"},
 	gbmenu = {v=false,e=true,x=90,y=83,sx=620,sy=42,func=function(self) state = "guestsend" substate="page1" end},
 	sNick = {v=true,e=true,x=330,y=170,sx=50,sy=50,func=function(self) visit(_G.Client.getUserByNickname(self.texts.sNick.text)) end,img="assets/icons/search.png"},

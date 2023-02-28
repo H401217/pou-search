@@ -54,6 +54,7 @@ end
 mod.langlist = {
 	"en",
 	"es",
+	"pt-br",
 	"Key",
 }
 
