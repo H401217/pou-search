@@ -1,5 +1,15 @@
 _G.cookie = ""
 
+local keepAliveThread = love.thread.newThread([[
+	local host = ...
+	local socket = require("socket")
+	local client = socket.tcp()
+	
+	while 1 do
+		socket.sleep(0.5)
+	end
+]])
+
 local likeUpdateThread = love.thread.newThread([[
 	local looped = true
 	local function End(ms)
@@ -42,7 +52,7 @@ local likeUpdateThread = love.thread.newThread([[
 		if msgs then
 			if msgs == "close" then print("bye") tcp:close() End("ok") break end
 		end
-		if os.clock()-timer > 10 then
+		if os.clock()-timer > 5 then
 			tcp:send("GET "..path.." HTTP/1.1\nHost:"..hos.."\nUser-Agent:Pou-Searcher\nConnection:Keep-Alive\nCookie:"..cookie.."\n\n")
 			local finres = ""
 			local body = ""
@@ -81,7 +91,7 @@ local function md5encode(str)
 end
 
 local host = "http://app.pou.me/"
-local versionCode = 256
+local versionCode = 267
 local versionVersion = 4
 
 local function urlencode(str)

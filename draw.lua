@@ -100,14 +100,19 @@ function draw:toDrawer(tab)
 end
 
 function draw:floodfill(canvas,x,y,col)
+	--if true then return false end
 	love.graphics.setCanvas()
 	local imgdata = canvas:newImageData()
 	love.graphics.setCanvas(canvas)
 	local oR,oG,oB,oA = imgdata:getPixel(x,y)
+	local remainingPixels = {}
+
 	local function paint(xx,yy)
+		--print(xx,yy)
+		if xx<0 or xx>300 or yy<0 or yy>300 then return end
 		local r,g,b,a = imgdata:getPixel(xx,yy)
 		if r==col.r and g == col.g and b == col.b then
-			
+			return
 		else
 			local rr = r-oR
 			local gg = g-oG
@@ -117,14 +122,23 @@ function draw:floodfill(canvas,x,y,col)
 			local fcol = (-0.5+(rr+gg+bb))*(color*5)
 			if (color < 0.15 and color > -0.15) or (r==oR and g==oG and b == oB and a == oA) then
 				imgdata:setPixel(xx,yy,col.r+fcol,col.g+fcol,col.b+fcol,1)
-				paint(xx+1,yy)
+				--[[paint(xx+1,yy)
 				paint(xx-1,yy)
 				paint(xx,yy+1)
-				paint(xx,yy-1)
+				paint(xx,yy-1)]]
+				table.insert(remainingPixels,{x=xx,y=yy})
 			end
 		end
 	end
 	paint(x,y)
+	while #remainingPixels>0 do
+		local v = remainingPixels[1]
+		paint(v.x+1,v.y)
+		paint(v.x+-1,v.y)
+		paint(v.x,v.y+1)
+		paint(v.x,v.y-1)
+		table.remove(remainingPixels,1)
+	end
 	local img = love.graphics.newImage(imgdata)
 	love.graphics.clear()
 	canvas:renderTo(function() love.graphics.draw(img) end)
@@ -134,41 +148,43 @@ function draw:floodfill(canvas,x,y,col)
 end
 
 function draw:drawPou(c,data)
+	print("drawingpou")
 	love.graphics.setCanvas(c)
 	local success,_r = pcall(function()
 	local cl = self.toCol("bodycolors",data.color)
 	local ecl = self.toCol("eyecolors",data.ecolor)
 	love.graphics.clear()
+--love.graphics.rectangle("fill",0,0,300,300)
 	love.graphics.setColor(0,0,0,1)
-	
+	love.graphics.setLineWidth(3)
 	local m = 0.3+0.7*((data.sz-0.5)*2)
-	local b1 = love.math.newBezierCurve({10+35-35*m,60-20+20*m, 40,0+40-40*m, 60,0+40-40*m, 90-35+35*m,60-20+20*m})
+	local b1 = love.math.newBezierCurve({20+105-105*m,180-60+60*m, 120,0+110-110*m, 180,0+110-110*m, 280-105+105*m,180-60+60*m})
 	love.graphics.line(b1:render())
 
-	local b2 = love.math.newBezierCurve({90-35+35*m,60-20+20*m, 95-35+35*m,80-30+30*m, 95-35+35*m,90-30+30*m, 50,95-35+35*m})
+	local b2 = love.math.newBezierCurve({280-105+105*m,180-60+60*m, 295-105+105*m,240-90+90*m, 295-105+105*m,290-90+90*m, 150,295-105+105*m})
 	love.graphics.line(b2:render())
 
-	local b3 = love.math.newBezierCurve({10+35-35*m,60-20+20*m, 5+35-35*m,80-30+30*m, 5+35-35*m,90-30+30*m, 50,95-35+35*m})
+	local b3 = love.math.newBezierCurve({20+105-105*m,180-60+60*m, 5+105-105*m,240-90+90*m, 5+105-105*m,290-90+90*m, 150,295-105+105*m})
 	love.graphics.line(b3:render())
-	local l1=80-30+30*m
+	local l1=240-90+90*m
 	love.graphics.setColor(1,1,1,1)
-	self:floodfill(c,50,l1,{r=cl.r/255,g=cl.g/255,b=cl.b/255,a=1})
-	love.graphics.ellipse("fill",57,36,7,9)
-	love.graphics.ellipse("fill",43,36,7,9)
+	self:floodfill(c,150,l1,{r=cl.r/255,g=cl.g/255,b=cl.b/255,a=1})
+	love.graphics.ellipse("fill",173,108,23,27)
+	love.graphics.ellipse("fill",127,108,23,27)
 	love.graphics.setColor(0,0,0,1)
-	love.graphics.ellipse("line",57,36,7,9)
-	love.graphics.ellipse("line",43,36,7,9)
+	love.graphics.ellipse("line",173,108,23,27)
+	love.graphics.ellipse("line",127,108,23,27)
 	love.graphics.setColor(ecl.r/255,ecl.g/255,ecl.b/255,1)
-	love.graphics.ellipse("fill",57,36,3,4)
-	love.graphics.ellipse("fill",43,36,3,4)
+	love.graphics.ellipse("fill",173,108,8.4,8.5)
+	love.graphics.ellipse("fill",127,108,8.4,8.5)
 	love.graphics.setColor(0,0,0,1)
 	local mo
 	if data.emote == "happy" then
-		mo = love.math.newBezierCurve({35+7-7*m,50, 30+7-7*m,60-5+5*m, 37+7-7*m,63-6+6*m, 42+3-3*m,58-2+2*m})
+		mo = love.math.newBezierCurve({105+21-21*m,150, 90+21-21*m,180-15+15*m, 111+21-21*m,189-18+18*m, 126+9-9*m,174-6+6*m})
 	elseif data.emote == "neutral" then
-		mo = love.math.newBezierCurve({44,55, 47.6,55, 53.3,55, 56,55})
+		mo = love.math.newBezierCurve({132,165, 142,165, 160,165, 168,165})
 	else
-		mo = love.math.newBezierCurve({46,60, 48.6,53, 51.3,53, 54,60})
+		mo = love.math.newBezierCurve({138,180, 145,159, 154,159, 162,180})
 	end
 	love.graphics.line(mo:render())
 	end)
@@ -179,6 +195,7 @@ function draw:drawPou(c,data)
 		love.graphics.draw(icons.missingpou,0,0,0,100/icons.missingpou:getWidth(),100/icons.missingpou:getHeight())
 	end
 	love.graphics.setCanvas()
+	love.graphics.setLineWidth(1)
 end
 
 function draw:drawGame(c,data,myID)

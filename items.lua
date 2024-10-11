@@ -51,8 +51,8 @@ mod.buttons = {
 	sMail = {v=true,e=true,x=330,y=270,sx=50,sy=50,func=function(self) visit(_G.Client.getUserByEmail(self.texts.sMail.text)) end,img="assets/icons/search.png"},
 	miniMail = {v=true,e=true,x=380,y=270,sx=50,sy=50,func=function(self) visit(_G.Client.getAvatarByEmail(self.texts.sMail.text),true) end,hint="searchmini",img="assets/icons/search_fast.png"},
 	sID = {v=true,e=true,x=330,y=370,sx=50,sy=50,func=function(self) visit(_G.Client.getUserById(self.texts.sID.text)) end,img="assets/icons/search.png"},
-	right = {v=true,e=true,x=730,y=290,sx=40,sy=40,func=function(self) local _,__ = string.gsub(substate,"page","") substate="page".. (tonumber(_) or 1)+1 end, img="assets/icons/next.png"},
-	left = {v=true,e=true,x=30,y=290,sx=40,sy=40,func=function(self) local _,__ = string.gsub(substate,"page","") substate="page".. (tonumber(_) or 1)-1 end, img="assets/icons/prev.png"},
+	right = {v=true,e=true,x=730,y=290,sx=40,sy=40,func=function(self) local _,__ = string.gsub(substate,"page","") substate="page".. (tonumber(_) or 1)+1 drawPous() end, img="assets/icons/next.png"},
+	left = {v=true,e=true,x=30,y=290,sx=40,sy=40,func=function(self) local _,__ = string.gsub(substate,"page","") substate="page".. (tonumber(_) or 1)-1 drawPous() end, img="assets/icons/prev.png"},
 	conf1 = {v=true,e=true,x=650,y=370,sx=30,sy=30,func=function(self) changeHost(self.texts.host.text) end}, --change host
 	conf2 = {v=true,e=true,x=330,y=120,sx=30,sy=30,func=function(self) userChange("name",self.texts.newNick.text) end}, --change name
 	conf4 = {v=true,e=true,x=330,y=185,sx=30,sy=30,func=function(self) userChange("mail",self.texts.newMail.text) end}, --change mail

@@ -64,14 +64,19 @@ function sColor(p)
 end
 
 function love.load()
+	love.window.showMessageBox("Warning!","This version of Pou-Search is still in construction (fast commit).\r\nRemember to NEVER put any personal information in this program unless you really and surely know what you're doing.\r\nThe original program is only located in Github, however you still need to check the code before proceeding.\r\n\r\nThis work is not in any way related or associated with Zakeh or other Pou creators.","warning")
 	versionName = "v0.8"
 	
 	width = love.graphics:getWidth()
 	height = love.graphics:getHeight()
 	
-	pouvisit = love.graphics.newCanvas(100,100)
-	minipou = love.graphics.newCanvas(100,100)
-	statspou = love.graphics.newCanvas(100,100)
+	pouvisit = love.graphics.newCanvas(300,300)
+	minipou = love.graphics.newCanvas(300,300)
+	gridpou = {}
+	for count = 1,10 do
+		gridpou[count] = love.graphics.newCanvas(300,300)
+	end
+	statspou = love.graphics.newCanvas(300,300)
 	tictactable = love.graphics.newCanvas(500,500)
 	extra = require("extra")
 	translate = require("translate")
@@ -124,7 +129,7 @@ function love.load()
 		b8 = love.graphics.newImage("assets/icons/button8.png"),
 	}
 	drawPou = require("draw")
-drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
+	drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 	sounds = {
 		trouble = love.audio.newSource("assets/sounds/error.mp3","static"),
 		success = love.audio.newSource("assets/sounds/levelup.ogg","static"),
@@ -411,6 +416,18 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 		end
 	end
 	topLikes = {}
+	function drawPous()
+		for count= 1,10 do
+			local pou = topLikes.items[(tonumber(substate:gsub("page",""),10)-1)*10+count]
+			if pou then
+				local mini = pou.minI or pou.oMinI or pou.sMinI or ""
+				local _s,JSON = pcall(function() return drawPou.toTable(mini) end)
+				if _s then
+					drawPou:drawPou(gridpou[count],drawPou:toDrawer(JSON))
+				end
+			end
+		end
+	end
 	function updateTop(str,news)
 		print(str)
 		if #str == 0 then badState("An Error Occurred") return end
@@ -420,13 +437,15 @@ drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 		else badState("No list found") return end
 		state = news or "top"
 		substate = "page1"
+		drawPous()
 	end
 	opname = "" --opponent name
 	curMatch = {}
 	function updateGame(str)
 		local tab = drawPou.toTable(str)
 		print(str)
-		topLikes = tab or {}		
+		topLikes = tab or {}
+		drawPous()		
 	end
 	
 	function updateMatch(str)
@@ -704,7 +723,7 @@ function love.draw()
 	if state == "visit" then
 		love.graphics.draw(icons.home,items.buttons.exit.x,items.buttons.exit.y,0,items.buttons.exit.sx/icons.home:getWidth(),items.buttons.exit.sy/icons.home:getHeight())
 		love.graphics.setFont(fonts.medpou)
-		love.graphics.draw(pouvisit,80,190,0,1,1)
+		love.graphics.draw(pouvisit,80,190,0,1/3,1/3)
 		if server.creator == account.id then love.graphics.setColor(0.96,0.87,0.2,1) end
 		love.graphics.print(account.name,200,190)
 		love.graphics.setColor(1,1,1,1)
@@ -825,8 +844,8 @@ function love.draw()
 						if mini~="" then
 							local _s,JSON = pcall(function() return drawPou.toTable(mini) end)
 							if _s then
-								drawPou:drawPou(minipou,drawPou:toDrawer(JSON))
-								love.graphics.draw(minipou,90+330*a,130+90*b,0,80/100,80/100)
+								--drawPou:drawPou(minipou,drawPou:toDrawer(JSON))
+								love.graphics.draw(gridpou[(a+1)+(2*b)],90+330*a,130+90*b,0,80/300,80/300)
 							else
 								love.graphics.draw(icons.missingpou,90+330*a,130+90*b,0,80/icons.missingpou:getWidth(),80/icons.missingpou:getHeight())
 							end
@@ -992,7 +1011,7 @@ function love.draw()
 		love.graphics.print(translate:Get("alltime"),607-fonts.def:getWidth(translate:Get("alltime"))/2,105-fonts.def:getHeight()/2)
 	elseif state == "livestats" then
 		love.graphics.draw(icons.home,items.buttons.exit.x,items.buttons.exit.y,0,items.buttons.exit.sx/icons.home:getWidth(),items.buttons.exit.sy/icons.home:getHeight())
-		love.graphics.draw(statspou,400,80,0,1,1,50,0)
+		love.graphics.draw(statspou,400,80,0,1/3,1/3,50,0)
 		love.graphics.setFont(fonts.smolpou)
 		love.graphics.print("Followers",400-fonts.smolpou:getWidth("Followers")/2,310)
 		love.graphics.print("Following",90,350)
@@ -1056,45 +1075,15 @@ function love.draw()
 	
 	--Error and success messages
 	love.graphics.setFont(fonts.smolpou)
-	if bannerTime <= 0.5 then
-		if bannerType == "success" then
-			love.graphics.setColor(0.1,0.8,0.1,1)
-			love.graphics.rectangle("fill",0,-60+60*(bannerTime*2),width,60)
-			love.graphics.setColor(1,1,1,1)
-			love.graphics.draw(icons.success,20,-45+(45*(bannerTime*2)), 0,50/icons.success:getWidth(),50/icons.success:getHeight())
-		else
-			love.graphics.setColor(0.8,0.1,0.1,1)
-			love.graphics.rectangle("fill",0,-60+60*(bannerTime*2),width,60)
-			love.graphics.setColor(1,1,1,1)
-			love.graphics.draw(icons.trouble,20,-45+(45*(bannerTime*2)), 0,50/icons.trouble:getWidth(),50/icons.trouble:getHeight())
-		end
-		love.graphics.print(bannerMsg,80,-40 +(((30-fonts.smolpou:getHeight()/2)+40)*(bannerTime*2)))
-	elseif bannerTime >= 1.5 and bannerTime <= 2 then
-		if bannerType == "success" then
-			love.graphics.setColor(0.1,0.8,0.1,1)
-			love.graphics.rectangle("fill",0,60*((2-bannerTime)*2)-60,width,60)
-			love.graphics.setColor(1,1,1,1)
-			love.graphics.draw(icons.success,20,-45+50*((2-bannerTime)*2), 0,50/icons.success:getWidth(),50/icons.success:getHeight())
-		else
-			love.graphics.setColor(0.8,0.1,0.1,1)
-			love.graphics.rectangle("fill",0,60*((2-bannerTime)*2)-60,width,60)
-			love.graphics.setColor(1,1,1,1)
-			love.graphics.draw(icons.trouble,20,-45+50*((2-bannerTime)*2), 0,50/icons.success:getWidth(),50/icons.success:getHeight())
-		end
-		love.graphics.print(bannerMsg,80,-40 +(((30-fonts.smolpou:getHeight()/2)+40)*((2-bannerTime)*2)))
-	elseif bannerTime > 0.5 and bannerTime < 2 then
-		if bannerType == "success" then
-			love.graphics.setColor(0.1,0.8,0.1,1)
-			love.graphics.rectangle("fill",0,0,width,60)
-			love.graphics.setColor(1,1,1,1)
-			love.graphics.draw(icons.success,20, 5,0,50/icons.success:getWidth(),50/icons.success:getHeight())
-		else
-			love.graphics.setColor(0.8,0.1,0.1,1)
-			love.graphics.rectangle("fill",0,0,width,60)
-			love.graphics.setColor(1,1,1,1)
-			love.graphics.draw(icons.trouble,20, 5,0,50/icons.success:getWidth(),50/icons.success:getHeight())
-		end
-		love.graphics.print(bannerMsg,80,30-fonts.smolpou:getHeight()/2)
+	if bannerTime < 2 then
+		local bY = ((bannerTime>0.5) and bannerTime<1.5 and 0) or ((bannerTime <= 0.5) and -60+60*(bannerTime*2) or 60*((2-bannerTime)*2)-60)
+		local col = (bannerType=="success") and {.1,.8,.1,1} or {.8,.1,.1,1}
+		local ico = (bannerType=="success") and "success" or "trouble"
+		love.graphics.setColor(col)
+		love.graphics.rectangle("fill",0,bY,width,60)
+		love.graphics.setColor(1,1,1,1)
+		love.graphics.draw(icons[ico],20,bY+5,0,50/icons[ico]:getWidth(),50/icons[ico]:getHeight())
+		love.graphics.print(bannerMsg,80,(bY+30)-fonts.smolpou:getHeight()/2)
 	end
 	love.graphics.setFont(fonts.def)
 	love.graphics.print("1.4.108".."	"..love.timer.getFPS().." FPS")
