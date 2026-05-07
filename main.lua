@@ -598,7 +598,7 @@ function love.mousepressed(x,y)
 end
 
 function love.update(dt)
-	--drawPou:drawPou(poudrawtest,{color = 1,sz = 0.5, talk = math.random()*2})
+	--drawPou:drawPou(poudrawtest,{color = 1,sz = 1, talk = math.random()*0.5, emote="veryhappy"})
 	bannerTime = bannerTime+dt
 	items:update(dt)
 	for a,b in pairs(items.buttons) do
@@ -1080,7 +1080,7 @@ function love.draw()
 	elseif state == "pouDrawTestPleaseDoNotUseThis" then
 		love.graphics.draw(poudrawtest,0,0)
 	end
-	--state = "home"--"pouDrawTestPleaseDoNotUseThis"
+	--state = "pouDrawTestPleaseDoNotUseThis"
 	love.graphics.setColor(1,1,1,1)
 	love.graphics.setFont(fonts.def)
 	items:draw()

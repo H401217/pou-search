@@ -89,8 +89,10 @@ function draw:toDrawer(tab)
 			ret.emote = "sad"
 		elseif emo < 300 then
 			ret.emote = "neutral"
-		else
+		elseif emo < 450 then
 			ret.emote = "happy"
+		else
+			ret.emote = "veryhappy"
 		end
 	end
 	if tab.sz then
@@ -167,7 +169,7 @@ function draw.emotion(emotion,size,pouSize,value1)
 	if emotion == "veryhappy" then
 		o=-45*c
 		p=-10*c
-		q,r,s=0,0,0
+		q,r,s=0,-10*c,0
 		t=45*c
 		u=45*c
 		v=-10*c
@@ -303,7 +305,7 @@ function draw:drawPou(c,data)
 		love.graphics.push()
 		love.graphics.translate(centerX,centerY)
 		local talkfactor = data.talk or 0
-		local p1,p2,p3,p4,p5,p6,p7,p8 = self.emotion("talking",500,1,talkfactor)
+		local p1,p2,p3,p4,p5,p6,p7,p8 = self.emotion(data.emote or "happy",datos.relative,datos.scale,talkfactor)
 		local b1 = love.math.newBezierCurve(self.threetoquad(p1,p2,p3,p4,p5,p6))
 		local b2 = love.math.newBezierCurve(self.threetoquad(p5,p6,p7,p8,p1,p2))
 		love.graphics.setColor(0,0,0,1)
@@ -315,7 +317,7 @@ function draw:drawPou(c,data)
 		local bez1x,bez1y = b1:evaluate(0.5)
 		local bez2x,bez2y = b2:evaluate(0.5)
 		local bez3x,bez3y = (bez1x+bez2x)/2,(bez1y+bez2y)/2
-		print("caca",bez3x+centerX/Pousize,bez3y)
+		--print("caca",bez3x+centerX/Pousize,bez3y)
 		love.graphics.setColor(1,1,1,1)
 		self:floodfill(c,bez3x+centerX,bez3y+centerY,{r=123/255,g=36/255,b=24/255,a=1})
 		love.graphics.push()
