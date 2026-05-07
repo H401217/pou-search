@@ -955,7 +955,7 @@ function love.draw()
 		love.graphics.setFont(fonts.medpou)
 		love.graphics.print("About Pou Search "..versionName,110,160)
 		love.graphics.setFont(fonts.smolpou)
-		love.graphics.print("'Pou Search' is an open source project in GitHub.\n(https://github.com/H401217/pou-search)\n\nCredits to:\n** Zakeh (Paul Salameh): Creator of Pou videogame\n** rxi: Creator of json.lua\n	(https://github.com/rxi/json.lua)\n**u/oesky: Brazilian Portuguese translation\n	(https://www.reddit.com/u/oesky)",110,220)
+		love.graphics.print("'Pou Search' is an open source project in GitHub.\n(https://github.com/H401217/pou-search)\n\nCredits to:\n** Zakeh (Paul Salameh): Creator of Pou videogame\n** rxi: Creator of json.lua\n	(https://github.com/rxi/json.lua)",110,220)
 		love.graphics.setFont(fonts.def)
 	elseif state == "login" then
 		love.graphics.draw(icons.home,items.buttons.exit.x,items.buttons.exit.y,0,items.buttons.exit.sx/icons.home:getWidth(),items.buttons.exit.sy/icons.home:getHeight())
