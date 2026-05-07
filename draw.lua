@@ -8,6 +8,18 @@
 local json = require("json")
 local draw = {}
 
+function draw.threetoquad(x1,y1, x0,y0, x4,y4)
+	print(x1,y1,x0,y0,x4,y4)
+	--0 is control middle
+	x2 = x1+(x0-x1)*(2/3)
+	y2 = y1+(y0-y1)*(2/3)
+
+	x3 = x4-(x4-x0)*(2/3)
+	y3 = y4-(y4-y0)*(2/3)
+
+	return {x1,y1,x2,y2,x3,y3,x4,y4}
+end
+
 function draw.fixJSON(nw)
 	local _t1 = 0
 	while 1 do
@@ -68,7 +80,7 @@ function draw.toCol(tn,c)
 	local t = colors[tn][tostring(c)]
 	if t then return t else return colors[tn]["1"] end
 end
-
+--450 = excited
 function draw:toDrawer(tab)
 	local ret = {color=1,sz=0.5,emote="happy"}
 	if tab.energy then
@@ -109,7 +121,7 @@ function draw:floodfill(canvas,x,y,col)
 
 	local function paint(xx,yy)
 		--print(xx,yy)
-		if xx<0 or xx>300 or yy<0 or yy>300 then return end
+		if xx<0 or xx>1000 or yy<0 or yy>1000 then return end
 		local r,g,b,a = imgdata:getPixel(xx,yy)
 		if r==col.r and g == col.g and b == col.b then
 			return
@@ -147,46 +159,205 @@ function draw:floodfill(canvas,x,y,col)
 	imgdata:release()
 end
 
+function draw.emotion(emotion,size,pouSize,value1)
+	local c = size/480
+	local pouSize = pouSize
+	--local g,h, i,j, m,n, k,l
+	local o,p, q,r, u,v, s,t
+	if emotion == "veryhappy" then
+		o=-45*c
+		p=-10*c
+		q,r,s=0,0,0
+		t=45*c
+		u=45*c
+		v=-10*c
+		--x=5
+	elseif emotion == "happy" then
+		o=-75*pouSize*c
+		p=-30*pouSize*c
+		q=-90*pouSize*c
+		r=22.5*pouSize*c
+		s=-90*pouSize*c
+		t=22.5*pouSize*c
+		u=-45*pouSize*c
+		v=7.5*pouSize*c
+	elseif emotion == "neutral" then
+		o = -15*c
+		p,q,r,s,t = 0,0,0,0,0
+		u,v = 15*c,15*c
+		--x = 5
+	elseif emotion == "sad" then
+		o=-15*c
+		p,q=0,0
+		r=-22.5*c
+		s=0
+		t=-22.5*c
+		u=15*c
+		v=0
+	elseif emotion == "talking" then
+		o=c*-(value1*40+20)
+		p,q=0,0
+		r=-(20*value1+15)*c
+		s=0
+		t=(55*value1+40)*c
+		u=-(o)
+		v=0
+	--elseif emotion == "veryhappy" then
+
+	elseif emotion == "yawn" then
+		o=-45*c
+		p=45*c
+		q=0
+		r=-90*c
+		s=0
+		t=90*c
+		u=45*c
+		v=45*c
+	elseif emotion == "wannaeat" then
+		o=-67.5*pouSize*c
+		p=40*c
+		q=0
+		r=-75*c
+		s=0
+		t=120*pouSize*c
+		u=67.5*pouSize*c
+		v=30*c
+		--x=5
+	elseif emotion == "no" then
+		o=-15*c
+		p,q=0,0
+		r=-22.5*c
+		s=0
+		t=-22.5*c
+		u=15*c
+		v=0
+		--x=5
+	elseif emotion == "eating" then
+		o=-30*c
+		p=0
+		q=0
+		r=-15*c
+		s=0
+		t=90*c
+		u=30*c
+		v=0
+		--x=5
+	elseif emotion == "excited" then --rie o sed
+		o=c*-(30*pouSize+30)
+		p=0
+		q=0
+		r=-(15*pouSize+30)*c
+		s=0
+		t=(pouSize*35+70)*c
+		u=-o
+		v=0
+		--x=10
+	end
+	return o,p,q,r,u,v,s,t
+end
+
 function draw:drawPou(c,data)
+	local datos = {
+		relative = c:getWidth()+100,
+		breath = 0,
+		fat = 0,
+		scale = data.sz or 1,
+		lookX = 0,
+		lookY = 0,
+	}
+
+	local centerX = c:getWidth()/2
+	local centerY = c:getHeight()/2
+
 	print("drawingpou")
 	love.graphics.setCanvas(c)
 	local success,_r = pcall(function()
-	local cl = self.toCol("bodycolors",data.color)
-	local ecl = self.toCol("eyecolors",data.ecolor)
-	love.graphics.clear()
---love.graphics.rectangle("fill",0,0,300,300)
-	love.graphics.setColor(0,0,0,1)
-	love.graphics.setLineWidth(3)
-	local m = 0.3+0.7*((data.sz-0.5)*2)
-	local b1 = love.math.newBezierCurve({20+105-105*m,180-60+60*m, 120,0+110-110*m, 180,0+110-110*m, 280-105+105*m,180-60+60*m})
-	love.graphics.line(b1:render())
+		local cl = self.toCol("bodycolors",data.color)
+		local ecl = self.toCol("eyecolors",data.ecolor)
+		local Pousize = datos.scale
+		
+		love.graphics.clear()
+		love.graphics.rectangle("line",0,0,centerX*2,centerY*2)
+		--	body color
+		love.graphics.push()
+		--love.graphics.scale(Pousize)
+		love.graphics.setColor(0,0,0,1)
+		love.graphics.setLineWidth(3)
+		love.graphics.translate(centerX,centerY)
+		local p1,p2,p3,p4,p5,p6 = 0,(datos.relative/480)*150*datos.scale, (-(datos.relative/480)*225*datos.scale-datos.breath)-datos.fat*(datos.relative/480),(datos.relative/480)*150*datos.scale  ,-(datos.relative/480)*150*datos.scale,0
+		local b1 = love.math.newBezierCurve(self.threetoquad(p1,p2,p3,p4,p5,p6))
+		love.graphics.line(b1:render())
+		local p1,p2,p3,p4,p5,p6 = -(datos.relative/480)*150*datos.scale,0, datos.lookX,-300*datos.scale*datos.relative/480+datos.lookY, (datos.relative/480)*150*datos.scale,0
+		local b2 = love.math.newBezierCurve(self.threetoquad(p1,p2,p3,p4,p5,p6))
+		local p1,p2,p3,p4,p5,p6 = (datos.relative/480)*150*datos.scale,0, (datos.relative/480)*225*datos.scale+datos.breath+datos.fat,(datos.relative/480)*150*datos.scale, 0,(datos.relative/480)*150*datos.scale
+		local b3 = love.math.newBezierCurve(self.threetoquad(p1,p2,p3,p4,p5,p6))
+		love.graphics.line(b2:render())
+		love.graphics.line(b3:render())
+		print(cl.r)
+		love.graphics.pop()
+		love.graphics.setColor(1,1,1,1)
+		--love.graphics.translate(-62.5,-62.5)
+		love.graphics.origin()
+		self:floodfill(c,centerX,centerY,{r=cl.r/255,g=cl.g/255,b=cl.b/255,a=1})
 
-	local b2 = love.math.newBezierCurve({280-105+105*m,180-60+60*m, 295-105+105*m,240-90+90*m, 295-105+105*m,290-90+90*m, 150,295-105+105*m})
-	love.graphics.line(b2:render())
+		love.graphics.push()
+		love.graphics.translate(centerX,centerY)
+		local talkfactor = data.talk or 0
+		local p1,p2,p3,p4,p5,p6,p7,p8 = self.emotion("talking",500,1,talkfactor)
+		local b1 = love.math.newBezierCurve(self.threetoquad(p1,p2,p3,p4,p5,p6))
+		local b2 = love.math.newBezierCurve(self.threetoquad(p5,p6,p7,p8,p1,p2))
+		love.graphics.setColor(0,0,0,1)
+		love.graphics.setLineWidth(1)
+		love.graphics.line(b1:render())
+		love.graphics.line(b2:render())
+		love.graphics.pop()
+		love.graphics.origin()
+		local bez1x,bez1y = b1:evaluate(0.5)
+		local bez2x,bez2y = b2:evaluate(0.5)
+		local bez3x,bez3y = (bez1x+bez2x)/2,(bez1y+bez2y)/2
+		print("caca",bez3x+centerX/Pousize,bez3y)
+		love.graphics.setColor(1,1,1,1)
+		self:floodfill(c,bez3x+centerX,bez3y+centerY,{r=123/255,g=36/255,b=24/255,a=1})
+		love.graphics.push()
+		love.graphics.translate(centerX,centerY)
+		love.graphics.setLineWidth(3)
+		love.graphics.setColor(0,0,0,1)
+		love.graphics.line(b1:render())
+		love.graphics.line(b2:render())
+		love.graphics.pop()
+		love.graphics.setColor(1,1,1,1)
+		
+		--[[
+		local m = 0.3+0.7*((data.sz-0.5)*2)
+		local b1 = love.math.newBezierCurve({20+105-105*m,180-60+60*m, 120,0+110-110*m, 180,0+110-110*m, 280-105+105*m,180-60+60*m})
+		love.graphics.line(b1:render())
 
-	local b3 = love.math.newBezierCurve({20+105-105*m,180-60+60*m, 5+105-105*m,240-90+90*m, 5+105-105*m,290-90+90*m, 150,295-105+105*m})
-	love.graphics.line(b3:render())
-	local l1=240-90+90*m
-	love.graphics.setColor(1,1,1,1)
-	self:floodfill(c,150,l1,{r=cl.r/255,g=cl.g/255,b=cl.b/255,a=1})
-	love.graphics.ellipse("fill",173,108,23,27)
-	love.graphics.ellipse("fill",127,108,23,27)
-	love.graphics.setColor(0,0,0,1)
-	love.graphics.ellipse("line",173,108,23,27)
-	love.graphics.ellipse("line",127,108,23,27)
-	love.graphics.setColor(ecl.r/255,ecl.g/255,ecl.b/255,1)
-	love.graphics.ellipse("fill",173,108,8.4,8.5)
-	love.graphics.ellipse("fill",127,108,8.4,8.5)
-	love.graphics.setColor(0,0,0,1)
-	local mo
-	if data.emote == "happy" then
-		mo = love.math.newBezierCurve({105+21-21*m,150, 90+21-21*m,180-15+15*m, 111+21-21*m,189-18+18*m, 126+9-9*m,174-6+6*m})
-	elseif data.emote == "neutral" then
-		mo = love.math.newBezierCurve({132,165, 142,165, 160,165, 168,165})
-	else
-		mo = love.math.newBezierCurve({138,180, 145,159, 154,159, 162,180})
-	end
-	love.graphics.line(mo:render())
+		local b2 = love.math.newBezierCurve({280-105+105*m,180-60+60*m, 295-105+105*m,240-90+90*m, 295-105+105*m,290-90+90*m, 150,295-105+105*m})
+		love.graphics.line(b2:render())
+
+		local b3 = love.math.newBezierCurve({20+105-105*m,180-60+60*m, 5+105-105*m,240-90+90*m, 5+105-105*m,290-90+90*m, 150,295-105+105*m})
+		love.graphics.line(b3:render())
+		local l1=240-90+90*m
+		love.graphics.setColor(1,1,1,1)
+		--self:floodfill(c,150,l1,{r=cl.r/255,g=cl.g/255,b=cl.b/255,a=1})
+		love.graphics.ellipse("fill",173,108,23,27)
+		love.graphics.ellipse("fill",127,108,23,27)
+		love.graphics.setColor(0,0,0,1)
+		love.graphics.ellipse("line",173,108,23,27)
+		love.graphics.ellipse("line",127,108,23,27)
+		love.graphics.setColor(ecl.r/255,ecl.g/255,ecl.b/255,1)
+		love.graphics.ellipse("fill",173,108,8.4,8.5)
+		love.graphics.ellipse("fill",127,108,8.4,8.5)
+		love.graphics.setColor(0,0,0,1)
+		local mo
+		if data.emote == "happy" then
+			mo = love.math.newBezierCurve({105+21-21*m,150, 90+21-21*m,180-15+15*m, 111+21-21*m,189-18+18*m, 126+9-9*m,174-6+6*m})
+		elseif data.emote == "neutral" then
+			mo = love.math.newBezierCurve({132,165, 142,165, 160,165, 168,165})
+		else
+			mo = love.math.newBezierCurve({138,180, 145,159, 154,159, 162,180})
+		end
+		love.graphics.line(mo:render())]]
 	end)
 	love.graphics.setColor(1,1,1,1)
 	if not success then

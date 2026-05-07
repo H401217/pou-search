@@ -13,7 +13,7 @@ local text = love.filesystem.read("Translator.csv")
 
 local mod = {}
 
-local split1 = mysplit(text,"\n")
+local split1 = mysplit(text,"\r\n")
 local __ = mysplit(split1[1],";")
 
 local mainlang = {}

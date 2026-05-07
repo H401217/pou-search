@@ -7,6 +7,10 @@
  |_|   \___/ \__,_| |_____/ \___|\__,_|_|  \___|_| |_|
                                                       
 Pou Search is an open source project in GitHub (https://github.com/H401217/pou-search).
+TODO:
+* support for pou 3d
+* fast switch between public and private server (with separate saved data)
+* a DELETE ALL DATA FROM APP option
 ]]
 
 function love.run()
@@ -64,12 +68,13 @@ function sColor(p)
 end
 
 function love.load()
-	love.window.showMessageBox("Warning!","This version of Pou-Search is still in construction (fast commit).\r\nRemember to NEVER put any personal information in this program unless you really and surely know what you're doing.\r\nThe original program is only located in Github, however you still need to check the code before proceeding.\r\n\r\nThis work is not in any way related or associated with Zakeh or other Pou creators.","warning")
-	versionName = "v0.8"
+	--love.window.showMessageBox("Warning!","This version of Pou-Search is still in construction (fast commit).\r\nRemember to NEVER put any personal information in this program unless you really and surely know what you're doing.\r\nThe original program is only located in Github, however you still need to check the code before proceeding.\r\n\r\nThis work is not in any way related or associated with Zakeh or other Pou creators.","warning")
+	versionName = "v0.81"
 	
 	width = love.graphics:getWidth()
 	height = love.graphics:getHeight()
 	
+	poudrawtest = love.graphics.newCanvas(500,500)
 	pouvisit = love.graphics.newCanvas(300,300)
 	minipou = love.graphics.newCanvas(300,300)
 	gridpou = {}
@@ -130,6 +135,9 @@ function love.load()
 	}
 	drawPou = require("draw")
 	drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
+
+	drawPou:drawPou(poudrawtest,{color = 1,sz = 0.5})
+
 	sounds = {
 		trouble = love.audio.newSource("assets/sounds/error.mp3","static"),
 		success = love.audio.newSource("assets/sounds/levelup.ogg","static"),
@@ -145,7 +153,7 @@ function love.load()
 		smolpou = love.graphics.newFont("pou.ttf",20),
 		def = love.graphics.getFont()
 	}
-	state = "home"
+	state = "home"--"pouDrawTestPleaseDoNotUseThis"
 	substate = ""
 	account = {
 		name = "Pou",
@@ -590,6 +598,7 @@ function love.mousepressed(x,y)
 end
 
 function love.update(dt)
+	--drawPou:drawPou(poudrawtest,{color = 1,sz = 0.5, talk = math.random()*2})
 	bannerTime = bannerTime+dt
 	items:update(dt)
 	for a,b in pairs(items.buttons) do
@@ -1068,7 +1077,10 @@ function love.draw()
 		love.graphics.print(l4,723,570-fonts.def:getHeight())
 		love.graphics.print("+Followers",500,451)
 		love.graphics.print("+Following",500,571)
+	elseif state == "pouDrawTestPleaseDoNotUseThis" then
+		love.graphics.draw(poudrawtest,0,0)
 	end
+	--state = "home"--"pouDrawTestPleaseDoNotUseThis"
 	love.graphics.setColor(1,1,1,1)
 	love.graphics.setFont(fonts.def)
 	items:draw()
@@ -1086,5 +1098,5 @@ function love.draw()
 		love.graphics.print(bannerMsg,80,(bY+30)-fonts.smolpou:getHeight()/2)
 	end
 	love.graphics.setFont(fonts.def)
-	love.graphics.print("1.4.108".."	"..love.timer.getFPS().." FPS")
+	love.graphics.print("1.4.125".."	"..love.timer.getFPS().." FPS")
 end
