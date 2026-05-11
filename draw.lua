@@ -329,6 +329,72 @@ function draw:drawPou(c,data)
 		love.graphics.pop()
 		love.graphics.setColor(1,1,1,1)
 		
+		--eyes
+		for _thisrepeatstwice = -1,1,2 do
+			love.graphics.setLineWidth(2)
+			
+			love.graphics.setColor(0,0,0,1)
+			local F = 1 --datos.scale
+			local rel = datos.relative/480
+			local c = 0+(30*F*rel)*_thisrepeatstwice
+			local d = -57*centerX*2/300 --(500) -- -60 (300)
+			local a = 30*rel*F
+			local f=a
+			local e=-a
+			local b=40*rel*F
+			local h=b
+			local g=-h
+			local j=0 --look x
+			local l=0 --look y
+			local i = 10*rel*F
+			local y = 0 --to h
+			local w = 0 --to g
+			local v = w
+			local x = y
+			local J = 0--rel
+			local n = 30*0.8*rel*F
+			local q = -7*rel*F
+			local s = q
+			local o=0.25*n
+			local r=5*rel*F
+			local t = r
+			local p=0.1*n
+
+			love.graphics.translate(centerX+c,centerY+d)
+			local b1 = love.math.newBezierCurve(f,0, f,h, e,h, e,0)
+			local b2 = love.math.newBezierCurve(e,0, e,g, f,g, f,0)
+			love.graphics.line(b1:render())
+			love.graphics.line(b2:render())
+			
+			if data.hungry then
+				love.graphics.push()
+				--love.graphics.origin()
+				love.graphics.translate(j+J,l+J)
+				love.graphics.circle("fill",0,0,n)
+				love.graphics.setColor(1,1,1,1)
+				love.graphics.circle("fill",q,s,o)
+				love.graphics.circle("fill",r,t,p)
+				love.graphics.pop()
+			else
+				love.graphics.circle("fill",j,l,i)
+			end
+			love.graphics.setColor(0,0,0,1)
+			--[[ parpados
+			local b1 = love.math.newBezierCurve(f,0, f,g, e,g, e,0)
+			local b2 = love.math.newBezierCurve(e,0, e,v, f,v, f,0)
+			love.graphics.line(b1:render())
+			love.graphics.line(b2:render())
+
+			local b1 = love.math.newBezierCurve(f,0, f,h, e,h, e,0)
+			local b2 = love.math.newBezierCurve(e,0, e,x, f,x, f,0)
+			love.graphics.line(b1:render())
+			love.graphics.line(b2:render())]]
+			love.graphics.origin()
+		end
+		--love.graphics.pop()
+		love.graphics.origin()
+		love.graphics.setColor(1,1,1,1)
+
 		--[[
 		local m = 0.3+0.7*((data.sz-0.5)*2)
 		local b1 = love.math.newBezierCurve({20+105-105*m,180-60+60*m, 120,0+110-110*m, 180,0+110-110*m, 280-105+105*m,180-60+60*m})

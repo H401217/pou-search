@@ -136,7 +136,7 @@ function love.load()
 	drawPou = require("draw")
 	drawPou:drawPou(pouvisit,{color = 1,sz = 0.5})
 
-	drawPou:drawPou(poudrawtest,{color = 1,sz = 0.5})
+	drawPou:drawPou(poudrawtest,{color = 1,sz = 1})
 
 	sounds = {
 		trouble = love.audio.newSource("assets/sounds/error.mp3","static"),
